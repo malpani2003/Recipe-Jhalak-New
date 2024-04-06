@@ -1,0 +1,240 @@
+[
+  {
+    "comments": [],
+    "cookingtime": 8,
+    "difficulty": "Moderate",
+    "foodArea": "Mexico",
+    "foodCategoryId": "63d555343573e24d91780549",
+    "foodDesc": ["Refreshing and tangy, this classic margarita is perfect for summer gatherings."],
+    "foodImg": "https://example.com/margarita-image.jpg",
+    "foodIngrediants": [
+      "2 oz Tequila",
+      "1 oz Lime Juice",
+      "1 oz Triple Sec",
+      "Ice Cubes",
+      "Salt for rimming the glass"
+    ],
+    "foodInstruction": [
+      "Rim the glass with salt.",
+      "In a shaker, combine tequila, lime juice, and triple sec.",
+      "Shake well and strain into the glass over ice."
+    ],
+    "foodName": "Classic Margarita",
+    "isDrink": "Yes",
+    "preparationTime": 15,
+    "previewImg": "https://example.com/margarita-preview.jpg"
+  },
+  {
+    "comments": [],
+    "cookingtime": 5,
+    "difficulty": "Easy",
+    "foodArea": "Japan",
+    "foodCategoryId": "63d555343573e24d9178054a",
+    "foodDesc": ["Matcha lovers rejoice! This iced matcha latte is a refreshing treat for any time of day."],
+    "foodImg": "https://example.com/matcha-latte-image.jpg",
+    "foodIngrediants": [
+      "1 tsp Matcha Powder",
+      "1 cup Milk",
+      "Ice Cubes",
+      "Honey or Sweetener (optional)"
+    ],
+    "foodInstruction": [
+      "Whisk matcha powder with a small amount of hot water until smooth.",
+      "Add cold milk and whisk until frothy.",
+      "Pour over ice and sweeten if desired."
+    ],
+    "foodName": "Iced Matcha Latte",
+    "isDrink": "Yes",
+    "preparationTime": 10,
+    "previewImg": "https://example.com/matcha-latte-preview.jpg"
+  },
+  {
+    "comments": [],
+    "cookingtime": 6,
+    "difficulty": "Easy",
+    "foodArea": "Italy",
+    "foodCategoryId": "63d555343573e24d9178054b",
+    "foodDesc": ["Indulge in the classic Italian dessert with this Tiramisu recipe. It's a heavenly combination of coffee, mascarpone, and cocoa."],
+    "foodImg": "https://example.com/tiramisu-image.jpg",
+    "foodIngrediants": [
+      "1 cup Strong Brewed Coffee",
+      "3 large Eggs",
+      "1 cup Mascarpone Cheese",
+      "Ladyfinger Cookies",
+      "Cocoa Powder"
+    ],
+    "foodInstruction": [
+      "Dip ladyfingers in coffee and layer them in a dish.",
+      "Whisk eggs and mix with mascarpone cheese.",
+      "Spread the mixture over the ladyfingers and dust with cocoa powder."
+    ],
+    "foodName": "Tiramisu",
+    "isDrink": "No",
+    "preparationTime": 20,
+    "previewImg": "https://example.com/tiramisu-preview.jpg"
+  },
+  {
+    "comments": [],
+    "cookingtime": 7,
+    "difficulty": "Intermediate",
+    "foodArea": "Thailand",
+    "foodCategoryId": "63d555343573e24d9178054c",
+    "foodDesc": ["Spicy and flavorful, Tom Yum Goong is a Thai classic soup with shrimp, mushrooms, and bold aromatic herbs."],
+    "foodImg": "https://example.com/tom-yum-goong-image.jpg",
+    "foodIngrediants": [
+      "400g Shrimp",
+      "200g Mushrooms",
+      "3 Lemongrass Stalks",
+      "Galangal",
+      "Kaffir Lime Leaves",
+      "Chili Paste",
+      "Fish Sauce",
+      "Lime Juice"
+    ],
+    "foodInstruction": [
+      "Bring lemongrass, galangal, and kaffir lime leaves to a boil.",
+      "Add shrimp, mushrooms, and chili paste.",
+      "Season with fish sauce and lime juice."
+    ],
+    "foodName": "Tom Yum Goong",
+    "isDrink": "No",
+    "preparationTime": 15,
+    "previewImg": "https://example.com/tom-yum-goong-preview.jpg"
+  },
+  {
+    "comments": [],
+    "cookingtime": 10,
+    "difficulty": "Easy",
+    "foodArea": "France",
+    "foodCategoryId": "63d555343573e24d9178054d",
+    "foodDesc": ["Transport yourself to the streets of Paris with this classic French Onion Soup. It's rich, savory, and topped with melted cheese."],
+    "foodImg": "https://example.com/french-onion-soup-image.jpg",
+    "foodIngrediants": [
+      "4 large Onions",
+      "1/4 cup Butter",
+      "1/2 cup Red Wine",
+      "Beef Broth",
+      "Baguette Slices",
+      "Gruyere Cheese"
+    ],
+    "foodInstruction": [
+      "Slice onions and cook in butter until caramelized.",
+      "Add red wine and simmer.",
+      "Top with baguette slices and Gruyere cheese before broiling."
+    ],
+    "foodName": "French Onion Soup",
+    "isDrink": "No",
+    "preparationTime": 25,
+    "previewImg": "https://example.com/french-onion-soup-preview.jpg"
+  },
+  {
+    "comments": [],
+    "cookingtime": 8,
+    "difficulty": "Intermediate",
+    "foodArea": "China",
+    "foodCategoryId": "63d555343573e24d9178054e",
+    "foodDesc": ["Savor the flavors of authentic Kung Pao Chicken with this recipe. It's a spicy and savory stir-fry that's sure to delight your taste buds."],
+    "foodImg": "https://example.com/kung-pao-chicken-image.jpg",
+    "foodIngrediants": [
+      "400g Chicken",
+      "1/2 cup Peanuts",
+      "Dried Red Chilies",
+      "Sichuan Peppercorns",
+      "Soy Sauce",
+      "Vinegar",
+      "Sugar",
+      "Ginger",
+      "Garlic"
+    ],
+    "foodInstruction": [
+      "Marinate chicken in soy sauce, vinegar, and sugar.",
+      "Stir-fry with peanuts, dried red chilies, Sichuan peppercorns, ginger, and garlic."
+    ],
+    "foodName": "Kung Pao Chicken",
+    "isDrink": "No",
+    "preparationTime": 20,
+    "previewImg": "https://example.com/kung-pao-chicken-preview.jpg"
+  },
+  {
+    "comments": [],
+    "cookingtime": 6,
+    "difficulty": "Easy",
+    "foodArea": "Greece",
+    "foodCategoryId": "63d555343573e24d9178054f",
+    "foodDesc": ["Enjoy the freshness of Greek Salad with this easy recipe. It's a colorful medley of tomatoes, cucumbers, olives, and feta cheese."],
+    "foodImg": "https://example.com/greek-salad-image.jpg",
+    "foodIngrediants": [
+      "Tomatoes",
+      "Cucumbers",
+      "Red Onion",
+      "Kalamata Olives",
+      "Feta Cheese",
+      "Olive Oil",
+      "Oregano",
+      "Lemon Juice"
+    ],
+    "foodInstruction": [
+      "Dice tomatoes, cucumbers, and red onion.",
+      "Combine with olives and feta cheese.",
+      "Drizzle with olive oil, sprinkle with oregano, and squeeze lemon juice."
+    ],
+    "foodName": "Greek Salad",
+    "isDrink": "No",
+    "preparationTime": 15,
+    "previewImg": "https://example.com/greek-salad-preview.jpg"
+  },
+  {
+    "comments": [],
+    "cookingtime": 7,
+    "difficulty": "Intermediate",
+    "foodArea": "Brazil",
+    "foodCategoryId": "63d555343573e24d91780550",
+    "foodDesc": ["Experience the vibrant flavors of Feijoada, a traditional Brazilian black bean stew with pork and sausages."],
+    "foodImg": "https://example.com/feijoada-image.jpg",
+    "foodIngrediants": [
+      "Black Beans",
+      "Pork Shoulder",
+      "Chorizo",
+      "Smoked Sausage",
+      "Onion",
+      "Garlic",
+      "Bay Leaves",
+      "Orange Peel"
+    ],
+    "foodInstruction": [
+      "Soak black beans overnight and cook with pork shoulder, chorizo, smoked sausage, onion, garlic, bay leaves, and orange peel."
+    ],
+    "foodName": "Feijoada",
+    "isDrink": "No",
+    "preparationTime": 30,
+    "previewImg": "https://example.com/feijoada-preview.jpg"
+  },
+  {
+    "comments": [],
+    "cookingtime": 5,
+    "difficulty": "Easy",
+    "foodArea": "Vietnam",
+    "foodCategoryId": "63d555343573e24d91780551",
+    "foodDesc": ["Pho, the iconic Vietnamese noodle soup, is a flavorful blend of broth, rice noodles, and herbs."],
+    "foodImg": "https://example.com/pho-image.jpg",
+    "foodIngrediants": [
+      "Rice Noodles",
+      "Beef Broth",
+      "Beef Slices",
+      "Bean Sprouts",
+      "Basil",
+      "Lime",
+      "Chili",
+      "Soy Sauce"
+    ],
+    "foodInstruction": [
+      "Cook rice noodles and place in a bowl.",
+      "Top with beef slices, bean sprouts, basil, lime, and chili.",
+      "Pour hot beef broth over the ingredients."
+    ],
+    "foodName": "Pho",
+    "isDrink": "No",
+    "preparationTime": 15,
+    "previewImg": "https://example.com/pho-preview.jpg"
+  }
+]

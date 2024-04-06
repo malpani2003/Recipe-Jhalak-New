@@ -1,0 +1,67 @@
+
+.container-fluid {
+    background-color: #f6f7fb;
+  }
+  
+  .register_form {
+    width: 45%;
+    margin: auto;
+    margin-top: 100px;
+    height: fit-content;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+  }
+  
+  .basic-addon1 {
+    cursor: pointer;
+  }
+  
+  .side_form {
+    background-color: #ffc107;
+    color: #333; /* Darken text color for better contrast */
+    text-align: center;
+    font-weight: bold;
+    padding: 30px; /* Add padding for better spacing */
+  }
+  
+  .side_form h3 {
+    margin-top: 20px;
+    font-size: 2.2rem;
+  }
+  
+  .side_form img {
+    width: 60%;
+    margin-top: 25px;
+  }
+  
+  .side_form a {
+    display: block;
+    color: #333; /* Darken link color for better contrast */
+    text-decoration: none;
+    margin-top: 20px;
+    font-weight: normal;
+  }
+  
+  .side_form a:hover {
+    text-decoration: underline; /* Underline link on hover */
+  }
+  
+  @media (max-width: 800px) {
+    .register_form {
+      width: 85%;
+    }
+  
+    .side_form {
+      display: none;
+    }
+  
+    .register_form img {
+      display: block;
+      width: 40%;
+      margin: auto;
+      margin-top: 20px;
+    }
+  }

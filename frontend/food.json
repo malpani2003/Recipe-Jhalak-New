@@ -1,0 +1,28 @@
+{
+    "fooditem":[
+      {
+        "category": "Italian",
+        "foodName": "Spaghetti Bolognese",
+        "ingredients": [
+          "300g ground beef",
+          "1 onion, finely chopped",
+          "2 cloves garlic, minced",
+          "1 can (400g) crushed tomatoes",
+          "2 tablespoons tomato paste",
+          "1 teaspoon dried oregano",
+          "1 teaspoon dried basil",
+          "Salt and pepper to taste",
+          "250g spaghetti",
+          "Grated Parmesan cheese for topping"
+        ],
+        "instructions": [
+          "In a large pan, brown the ground beef over medium heat.",
+          "Add chopped onions and garlic, sauté until onions are translucent.",
+          "Stir in crushed tomatoes, tomato paste, oregano, basil, salt, and pepper.",
+          "Simmer for 20-30 minutes, stirring occasionally.",
+          "Meanwhile, cook spaghetti according to package instructions.",
+          "Serve the Bolognese sauce over cooked spaghetti and top with grated Parmesan cheese."
+        ]
+      }
+]
+}

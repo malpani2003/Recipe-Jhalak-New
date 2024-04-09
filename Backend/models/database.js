@@ -2,13 +2,12 @@ const mongoose = require("mongoose");
 const validator=require("validator");
 mongoose.set("strictQuery", false);
 
-<<<<<<< HEAD
-const url = "mongodb://127.0.0.1:27017/RecipeApp";
-// console.log("hi");
-=======
-const url="mongodb://localhost:27017/RecipeApp"
-// const url = "mongodb+srv://pranavmaheshwari123:DWmyNYsOIlTP9jaU@cluster0.vzvevlk.mongodb.net/RecipeApp";
->>>>>>> 820f384966f394e8bd3fc1222f50c76a79fad409
+
+// const url = "mongodb://127.0.0.1:27017/RecipeApp";
+
+// const url="mongodb://localhost:27017/RecipeApp"
+const url = "mongodb+srv://pranavmaheshwari123:DWmyNYsOIlTP9jaU@cluster0.vzvevlk.mongodb.net/RecipeApp";
+
 mongoose
   .connect(url)
   .then(() => {

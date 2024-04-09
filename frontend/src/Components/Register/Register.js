@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import './Register.css'
+import axios from 'axios'
 function Register() {
 
   const [PasswordErr,setPasswordErr]=useState(false);
+  const [responseMsg, setResponseMsg] = useState(null);
 
   function handlePasswordMatch(event){
     const cpassword=document.getElementById("cpassword").value;
@@ -17,20 +19,40 @@ function Register() {
     // console.log(password,cpassword);
   }
 
-  function handleSubmit(event){
+  async function handleSubmit(event){
     
     event.preventDefault();
     const name=document.getElementById("name").value;
     const email=document.getElementById("email").value;
     const password=document.getElementById("password").value;
+    const cpassword=document.getElementById('cpassword').value;
     const Checkbtn=document.getElementById("check");
 
     console.log(Checkbtn);
     if(PasswordErr || !name || !email || !password ){
       console.log("Cannot Submitt form");
     }
-    // console.log(name,email,password);
-  }
+    console.log(name,email,password);
+    const Data={
+      "name":name,
+      "email":email,
+      "password":password,
+      "cpassword":cpassword,
+      "isAdmin":0
+    }
+    try{
+      const response=await axios.post("http://localhost:3001/api/users/register/",Data);
+      console.log(response);
+      setResponseMsg({ type: "success", msg: "Register successful!" });
+    }
+    catch(error){
+      setResponseMsg({
+        type: "danger",
+        msg: error.response?.data?.message || "An error occurred during Register.",
+      });
+    }
+
+    }
 
   function handleShowpassword(event){
       const passwordBtn=document.getElementById("password");
@@ -74,6 +96,11 @@ function Register() {
           {/* <label for="" class="form-label">
             Name
           </label> */}
+          {responseMsg && (
+            <div className={`alert alert-${responseMsg.type}`} role="alert">
+              {responseMsg.msg}
+            </div>
+          )}
           <div class="input-group mb-3 my-3">
             <div class="input-group-prepend">
               <span class="input-group-text" id="basic-addon1">
@@ -157,7 +184,8 @@ function Register() {
           <input
             type="reset"
             value="Cancel"
-            class="btn btn-outline-danger my-3"
+            class="btn btn-outline-danger my-3 mx-2"
+            onClick={()=>{setResponseMsg(null) setPasswordErr(null)}}
           />
         </form>
       </div>

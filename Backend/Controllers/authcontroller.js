@@ -3,7 +3,7 @@ const UserCollection = require("../models/database").users;
 const bcryptjs = require("bcryptjs");
 const jsonwebtoken = require("jsonwebtoken");
 
-const secretId = process.env.SECERTKEY;
+const secretId = process.env.SECERTKEY || "RecipeDekh";
 const expiresIn = 10;
 
 function getToken(id) {
@@ -23,6 +23,7 @@ module.exports = {
         const checkUserAlready = await UserCollection.find({
           Email_id: userData.email,
         });
+        console.log(checkUserAlready)
         if (checkUserAlready.length !== 0) {
           response.status(409).send({
             message: "User with Email id Already Exist",

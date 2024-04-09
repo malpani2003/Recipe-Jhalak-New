@@ -4,15 +4,15 @@ const cookie_parser = require("cookie-parser");
 const app = express();
 const logger=require("morgan");
 
-<<<<<<< HEAD
+
 const authroutes = require("./routes/authroutes");
 const categoryroutes = require("./routes/categoryRoutes");
 const foodRoutes = require("./routes/FoodRoutes");
 const cors=require("cors")
-const port = process.env.PORT;
-=======
+// const port = process.env.PORT;
+
 const port = 3001;
->>>>>>> 820f384966f394e8bd3fc1222f50c76a79fad409
+
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));

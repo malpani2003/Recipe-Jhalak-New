@@ -1,16 +1,17 @@
 require("dotenv").config();
 const express = require("express");
 const cookie_parser = require("cookie-parser");
-const app = express();
 const logger=require("morgan");
 
-
+// const importModules=require("./ModuleImport");
 const authroutes = require("./routes/authroutes");
+const verificationroutes = require("./routes/verificationroutes");
 const categoryroutes = require("./routes/categoryRoutes");
 const foodRoutes = require("./routes/FoodRoutes");
 const cors=require("cors")
 // const port = process.env.PORT;
 
+const app = express();
 const port = 3001;
 
 
@@ -18,7 +19,13 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookie_parser());
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+      origin: 'http://localhost:3000',
+      optionsSuccessStatus: 200,
+      credentials: true,
+  })
+);
 app.use(logger("dev"));
 
 app.get("/api", (request, response) => {

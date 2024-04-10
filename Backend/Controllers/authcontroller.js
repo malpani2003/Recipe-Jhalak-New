@@ -1,120 +1,219 @@
 require("dotenv").config();
 const UserCollection = require("../models/database").users;
+const Verification = require("../models/database").verification;
+
 const bcryptjs = require("bcryptjs");
 const jsonwebtoken = require("jsonwebtoken");
-
+const nodemailer = require("nodemailer");
+const { v4: uuidv4 } = require('uuid');
 const secretId = process.env.SECERTKEY || "RecipeDekh";
-const expiresIn = 10;
+const expiresIn = 1;
 
+const transportar = nodemailer.createTransport({
+  service: "gmail",
+  secure: false,
+  auth: {
+    user: process.env.AUTH_EMAIL,
+    pass: process.env.AUTH_PASS
+  }
+})
 function getToken(id) {
   return jsonwebtoken.sign({ id }, secretId, { expiresIn: expiresIn + "h" });
 }
- 
-module.exports = {
-  registerUser: async (request, response) => {
-    try {
-      const userData = request.body;
-      console.log(userData);
-      if (userData.password !== userData.cpassword && false) {
-        response.status(400).send({
-          message: "Confirm Password is not the same as Password",
-        });
-      } else {
-        const checkUserAlready = await UserCollection.find({
-          Email_id: userData.email,
-        });
-        console.log(checkUserAlready)
-        if (checkUserAlready.length !== 0) {
-          response.status(409).send({
-            message: "User with Email id Already Exist",
-          });
-        } else {
-          const hashPassword = bcryptjs.hashSync(userData.password, 10);
 
-          const newUser = new UserCollection({
-            Name: userData.name.trim(),
-            Email_id: userData.email.toLowerCase().trim(),
-            Password: hashPassword.trim(),
-            isAdmin: userData.isAdmin == 1 ? true : false,
-          });
+function EmailSend() {
 
-          const result = await newUser.save();
-          const tokenId = getToken(result._id);
-          response.header("Auth",tokenId);
-          response.status(201).send({
-            message: "Successfully Register",
-            token: tokenId,
-          });
-        }
-      }
-    } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+
+  transportar.verify((err, success) => {
+    if (err) {
+      console.log(err);
     }
-  },
+    else {
+      console.log("Ready for Sending Messages");
+      console.log(success)
+    }
+  })
+}
 
-  postLogin: async (request, response) => {
-    try {
-      const { email, password } = request.body;
-      const checkUserAlready = await UserCollection.findOne({
-        Email_id: email.toLowerCase(),
+// EmailSend()
+
+async function sendVerificationEmail({ _id, Email_id, Name }) {
+
+  // Email content
+  const emailContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px;">
+        <h2>Email Verification</h2>
+        <p>Hello, {{Name}}</p>
+        <p>Please click the following link to verify your email address:</p>
+        <p><a href="http://localhost:3001/api/users/verify-email/{{id}}/{{verificationToken}}" target="_blank">Verify Email</a></p>
+        <p>If you did not request this, please ignore this email.</p>
+        <p>Thank you,</p>
+        <p>Recipe Jhalak</p>
+    </div>
+</body>
+</html>
+`;
+  const uniqueString = uuidv4() + _id;
+
+  const mailOptions = {
+    from: process.env.AUTH_EMAIL,
+    to: Email_id, // receiver
+    subject: "Recipe Jhalak - Verification Link", // Subject line
+    html: emailContent.replace('{{Name}}', Name).replace('{{verificationToken}}', uniqueString).replace('{{id}}',_id)
+  }
+
+  const hashUniqueString = await bcryptjs.hash(uniqueString, 10);
+  const newVerificationData = new Verification({
+    userId: _id,
+    verificationString: hashUniqueString,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 1000*60*60
+  })
+  const result=await newVerificationData.save();
+  if(!result){
+    console.log("Verifcation Link cannot be not send")
+  }
+  transportar.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log("Verification link is not send");
+    }
+    else {
+      console.log("Verification Link is send: ", info)
+    }
+  })
+}
+
+const registerUser = async (request, response) => {
+  try {
+    const userData = request.body;
+    // console.log(userData);
+
+    if (userData.password !== userData.cpassword) {
+      return response.status(400).send({
+        error: true,
+        message: "Confirm Password is not the same as Password",
       });
-      console.log(checkUserAlready);
-
-      if (checkUserAlready) {
-        const realPassword = checkUserAlready.Password;
-        const checkPassword = bcryptjs.compareSync(password, realPassword);
-
-        if (checkPassword) {
-          const tokenId = getToken(checkUserAlready._id);
-          response.header("authorization",`Bearer ${tokenId}`);
-          response.header("Access-Control-Allow-Credentials", true);
-          response.status(200).send({
-            message: "Successfully Login",
-            token: tokenId,
-          });
-        } else {
-          response.status(400).send({
-            message: "Entered Incorrect Password",
-          });
-        }
-      } else {
-        response.status(400).send({
-          message: "User Does not Exist. Please Register",
-        });
-      }
-    } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
     }
-  },
 
-  userProfile: async (request, response) => {
-    const userId = request.user;
+    const checkUserAlready = await UserCollection.find({
+      Email_id: userData.email,
+    });
 
-    try {
-      const user_data = await UserCollection.findOne(
-        {
-          _id: userId,
-        },
-        { Password: 0 }
-      );
-
-      if (user_data) {
-        response.status(200).send(user_data);
-      } else {
-        response.status(404).send({ message: "User not found" });
-      }
-    } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+    // console.log(checkUserAlready)
+    if (checkUserAlready.length !== 0) {
+      return response.status(409).send({
+        error: true,
+        message: "User with Email id Already Exist",
+      });
     }
-  },
-};
 
+    const hashPassword = bcryptjs.hashSync(userData.password, 10);
+
+    const newUser = new UserCollection({
+      Name: userData.name.trim(),
+      Email_id: userData.email.toLowerCase().trim(),
+      Password: hashPassword.trim(),
+      isAdmin: userData.isAdmin == 1 ? true : false,
+    });
+
+    const result = await newUser.save();
+    if (!result) {
+      return response.status(400).send({ error: true, message: "User cannot be Registered" });
+    }
+    console.log(result)
+    sendVerificationEmail(result);
+    const tokenId = getToken(result._id);
+    response.header("Auth", tokenId);
+    response.status(201).send({
+      error: false,
+      message: "Successfully Register",
+      token: tokenId,
+    });
+  }
+  catch (error) {
+    return response
+      .status(500)
+      .json({ error: true, message: `Internal Server Error as ${error.message}` });
+  }
+}
+
+const postLogin = async (request, response) => {
+  try {
+    const { email, password } = request.body;
+
+    if (!email || !password) {
+      return response.status(422).send({ error: true, message: "Please Entered Correct Details" });
+    }
+    const checkUserAlready = await UserCollection.findOne({
+      Email_id: email.toLowerCase(),
+    });
+    console.log(checkUserAlready);
+
+    if (!checkUserAlready) {
+      return response.status(400).send({
+        error: true,
+        message: "User Does not Exist. Please Register",
+      });
+    }
+    const realPassword = checkUserAlready.Password;
+    const checkPassword = bcryptjs.compareSync(password, realPassword);
+
+    if (!checkPassword) {
+      return response.status(400).send({
+        error: true,
+        message: "Entered Incorrect Password",
+      });
+    }
+
+    const tokenId = getToken(checkUserAlready._id);
+    response.header("authorization", `Bearer ${tokenId}`);
+    response.header("Access-Control-Allow-Credentials", true);
+    response.status(200).send({
+      error: false,
+      message: "Successfully Login",
+      token: tokenId,
+    });
+  } catch (error) {
+    response
+      .status(500)
+      .json({ error: true, message: `Internal Server Error ${error.message}` });
+  }
+}
+
+const userProfile = async (request, response) => {
+  const userId = request.user;
+
+  try {
+    const user_data = await UserCollection.findOne(
+      {
+        _id: userId,
+      },
+      { Password: 0 }
+    );
+
+    if (user_data) {
+      return response.status(200).send({ error: false, message: user_data });
+    }
+    return response.status(404).send({ error: true, message: "User not found" });
+  } catch (error) {
+    return response
+      .status(500)
+      .json({ error: true, message: `Internal Server Error ${error.message}` });
+  }
+}
+module.exports = {
+  registerUser,
+  postLogin,
+  userProfile
+}
 // module.exports = {
 
 //     Post_Register: async (request, response) => {

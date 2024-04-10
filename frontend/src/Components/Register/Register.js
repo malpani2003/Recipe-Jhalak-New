@@ -75,10 +75,10 @@ function Register() {
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-5 side_form">
-          <img
+          {/* <img
             src="https://cdn-icons-png.flaticon.com/512/219/219969.png"
             alt=""
-          ></img>
+          ></img> */}
           <h3>Register Form</h3>
           <p>
             Register with Recipe Jhalak to receive the most recent recipes and
@@ -185,7 +185,7 @@ function Register() {
             type="reset"
             value="Cancel"
             class="btn btn-outline-danger my-3 mx-2"
-            onClick={()=>{setResponseMsg(null) setPasswordErr(null)}}
+            onClick={()=>{setResponseMsg(null)}}
           />
         </form>
       </div>

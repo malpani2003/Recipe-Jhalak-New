@@ -12,7 +12,7 @@ function PopularCategory() {
           const response = await axios.get(
             "http://localhost:3001/api/category/all"
           );
-          // console.log(response.data);
+          console.log(response.data);
           setCategory(response.data.splice(0, 6));
         } catch (err) {
           console.log("Error Occurred");

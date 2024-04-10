@@ -15,7 +15,7 @@ mongoose
   })
   .catch((err) => console.error("Database is not connected:", err.message));
 
-const categorySchema = new mongoose.Schema({
+const categorySchema = new mongoose.Schema({ 
   Category_Name: {
     type: String,
     maxlength: 25,
@@ -105,16 +105,33 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  Verified:{
+    type:Boolean,
+    default:false
+  }
 },{
   timestamps:true
 });
 
+const userVerificationSchema=new mongoose.Schema({
+  userId:{
+    type:String
+  },
+  verificationString:{
+    type:String,
+    unique:true,
+  },
+  createdAt:Date,
+  expiresAt:Date
+})
 const categories = mongoose.model("categories", categorySchema);
 const items = mongoose.model("items", foodSchema);
 const users = mongoose.model("users", userSchema);
+const verification=mongoose.model("verification",userVerificationSchema);
 
 module.exports = {
   categories: categories,
   items: items,
   users: users,
+  verification:verification,
 };

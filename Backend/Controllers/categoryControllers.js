@@ -31,7 +31,7 @@ const getAllCategory = async (request, response) => {
     return response.status(200).json(allCategories);
   } catch (error) {
     return response
-      .status(500)
+      .status(500) 
       .json({ error: `Internal Server Error ${error.message}` });
   }
 }

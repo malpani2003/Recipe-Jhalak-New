@@ -43,7 +43,7 @@ function Register() {
     try{
       const response=await axios.post("http://localhost:3001/api/users/register/",Data);
       console.log(response);
-      setResponseMsg({ type: "success", msg: "Register successful!" });
+      setResponseMsg({ type: "success", msg: "Verification Link send to Email" });
     }
     catch(error){
       setResponseMsg({
@@ -97,8 +97,9 @@ function Register() {
             Name
           </label> */}
           {responseMsg && (
-            <div className={`alert alert-${responseMsg.type}`} role="alert">
+            <div className={`alert alert-${responseMsg.type} d-flex`} role="alert">
               {responseMsg.msg}
+              <button type="button" class="btn-close mx-5" aria-label="Close" onClick={()=>setResponseMsg(null)}></button>
             </div>
           )}
           <div class="input-group mb-3 my-3">

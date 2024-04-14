@@ -21,19 +21,17 @@ function getToken(id) {
   return jsonwebtoken.sign({ id }, secretId, { expiresIn: expiresIn + "h" });
 }
 
-function EmailSend() {
-
-
-  transportar.verify((err, success) => {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      console.log("Ready for Sending Messages");
-      console.log(success)
-    }
-  })
-}
+// function EmailSend() {
+//   transportar.verify((err, success) => {
+//     if (err) {
+//       console.log(err);
+//     }
+//     else {
+//       console.log("Ready for Sending Messages");
+//       console.log(success)
+//     }
+//   })
+// }
 
 // EmailSend()
 
@@ -51,9 +49,10 @@ async function sendVerificationEmail({ _id, Email_id, Name }) {
 <body>
     <div style="font-family: Arial, sans-serif; max-width: 600px;">
         <h2>Email Verification</h2>
-        <p>Hello, {{Name}}</p>
-        <p>Please click the following link to verify your email address:</p>
+        <p>Dear, {{Name}}</p>
+        <p>Thank you for Registering with RecipeJhalak . To Complete registration Please click the following link to verify your email address:</p>
         <p><a href="http://localhost:3001/api/users/verify-email/{{id}}/{{verificationToken}}" target="_blank">Verify Email</a></p>
+        <p>Once your Account is Verified you can access any recipe on our Platform</p>
         <p>If you did not request this, please ignore this email.</p>
         <p>Thank you,</p>
         <p>Recipe Jhalak</p>
@@ -67,7 +66,7 @@ async function sendVerificationEmail({ _id, Email_id, Name }) {
     from: process.env.AUTH_EMAIL,
     to: Email_id, // receiver
     subject: "Recipe Jhalak - Verification Link", // Subject line
-    html: emailContent.replace('{{Name}}', Name).replace('{{verificationToken}}', uniqueString).replace('{{id}}',_id)
+    html: emailContent.replace('{{Name}}', Name).replace('{{verificationToken}}', uniqueString).replace('{{id}}', _id)
   }
 
   const hashUniqueString = await bcryptjs.hash(uniqueString, 10);
@@ -75,18 +74,21 @@ async function sendVerificationEmail({ _id, Email_id, Name }) {
     userId: _id,
     verificationString: hashUniqueString,
     createdAt: Date.now(),
-    expiresAt: Date.now() + 1000*60*60
+    expiresAt: Date.now() + 1000 * 60 * 5
   })
-  const result=await newVerificationData.save();
-  if(!result){
+  const result = await newVerificationData.save();
+  if (!result) {
     console.log("Verifcation Link cannot be not send")
+    return false;
   }
   transportar.sendMail(mailOptions, (err, info) => {
     if (err) {
       console.log("Verification link is not send");
+      return false;
     }
     else {
       console.log("Verification Link is send: ", info)
+      return true;
     }
   })
 }
@@ -129,13 +131,15 @@ const registerUser = async (request, response) => {
       return response.status(400).send({ error: true, message: "User cannot be Registered" });
     }
     console.log(result)
-    sendVerificationEmail(result);
+    const isVerificationLinkSent = sendVerificationEmail(result);
     const tokenId = getToken(result._id);
     response.header("Auth", tokenId);
-    response.status(201).send({
+
+    const successMessage = isVerificationLinkSent ? "Registration Completed, Verification Link Sent on Email" : "Registration Completed";
+    return response.status(201).send({
       error: false,
-      message: "Successfully Register",
-      token: tokenId,
+      message: successMessage,
+      token: authToken,
     });
   }
   catch (error) {
@@ -174,7 +178,8 @@ const postLogin = async (request, response) => {
     }
 
     const tokenId = getToken(checkUserAlready._id);
-    response.header("authorization", `Bearer ${tokenId}`);
+    response.cookie('Token', tokenId, { path: "/", expiresIn: new Date(Date.now() + 1000 * 60 * 60 * 24), sameSite: "lax", httpOnly: true });
+    response.header("Authorization", `Bearer ${tokenId}`);
     response.header("Access-Control-Allow-Credentials", true);
     response.status(200).send({
       error: false,
@@ -200,6 +205,7 @@ const userProfile = async (request, response) => {
     );
 
     if (user_data) {
+      console.log(user_data)
       return response.status(200).send({ error: false, message: user_data });
     }
     return response.status(404).send({ error: true, message: "User not found" });

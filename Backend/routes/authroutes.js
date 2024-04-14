@@ -1,7 +1,9 @@
 const { Router } = require("express")
-const authmiddleware=require("../middleware/authmiddleware");
-const authController=require("../Controllers/authcontroller");
-const router=Router();
+const authmiddleware = require("../middleware/authmiddleware");
+const authController = require("../Controllers/authcontroller");
+const VerifcationController = require("../Controllers/verificationController");
+
+const router = Router();
 
 function authenticateToken(request, response, next) {
     authmiddleware.verifyToken(request, response);
@@ -12,14 +14,13 @@ function authenticateToken(request, response, next) {
 //     nex
 // }
 
-router.post("/register",authController.registerUser);
-router.post("/login",authController.postLogin); 
-router.get("/profile",authenticateToken,authController.userProfile);
-
-const VerifcationController = require("../Controllers/verificationController");
+router.post("/register", authController.registerUser);
+router.post("/login", authController.postLogin);
+router.get("/profile", authenticateToken, authController.userProfile);
 
 
-router.get("/verify-email/:userId/:verifyString",VerifcationController.verifyLink);
+
+router.get("/verify-email/:userId/:verifyString", VerifcationController.verifyLink);
 
 
 // router.get("/otp_verification/:user_id",authmiddleware.get_token,authcontroller.OTP_Verification_get);
@@ -28,5 +29,5 @@ router.get("/verify-email/:userId/:verifyString",VerifcationController.verifyLin
 // router.get("/logout",authmiddleware.get_token,authController.Logout_User);
 
 
-module.exports=router;
+module.exports = router;
 // Router

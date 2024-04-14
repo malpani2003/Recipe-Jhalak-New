@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [responseMsg, setResponseMsg] = useState(null);
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -18,15 +21,18 @@ function Login() {
     try {
       const response = await axios.post(
         "http://localhost:3001/api/users/login/",
-        { email, password }
+        { email, password }, {
+        withCredentials: true
+      }
       );
 
       if (response.status === 200) {
         console.log(response.data)
         // const authToken = response.headers["authorization"];
-        const authToken=response.data["token"];
+        const authToken = response.data["token"];
         localStorage.setItem("authToken", authToken);
         setResponseMsg({ type: "success", msg: "Login successful!" });
+        navigate("/profile");
       } else {
         setResponseMsg({ type: "danger", msg: "Unexpected response from the server." });
       }

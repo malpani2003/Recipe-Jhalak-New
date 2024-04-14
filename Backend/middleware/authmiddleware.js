@@ -3,7 +3,7 @@ const jsonwebtoken = require("jsonwebtoken");
 require("dotenv").config();
 
 
-const secretId = process.env.SECERTKEY;
+const secretId = process.env.SECERTKEY || "RecipeDekh";
 
 const isAdmin = async (request, response, next) => {
   const token = request.header("Auth");
@@ -19,6 +19,7 @@ const isAdmin = async (request, response, next) => {
     if (isAdmin) {
       next();
     } else {
+
       response
         .status(403)
         .json({ error: "Forbidden. Only admins can perform this action." });
@@ -28,11 +29,12 @@ const isAdmin = async (request, response, next) => {
   }
 };
 const verifyToken = async (request, response) => {
-  const token = request.header("Auth");
+  console.log(request.cookies["Token"]);
+  const token = request.header("Auth") || request.cookies["Token"];
   console.log(token);
   if (!token) return response.status(401).send("Access Denied");
 
-  try {
+  try { 
     const decoded = jsonwebtoken.verify(token, secretId);
     request.user = decoded.id;
     return;

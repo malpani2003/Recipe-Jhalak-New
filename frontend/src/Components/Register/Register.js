@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import './Register.css'
 import axios from 'axios'
-function Register() {
+import { BsPersonCircle } from "react-icons/bs";
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 
+function Register() {
+  const notifyDanger = (message) => {
+    toast.error(message, { autoClose: 3000 });
+  };
+  const notifySuccess= (message) => {
+    toast.success(message, { autoClose: 3000 });
+  };
   const [PasswordErr,setPasswordErr]=useState(false);
   const [responseMsg, setResponseMsg] = useState(null);
 
@@ -25,7 +34,7 @@ function Register() {
     const name=document.getElementById("name").value;
     const email=document.getElementById("email").value;
     const password=document.getElementById("password").value;
-    const cpassword=document.getElementById('cpassword').value;
+    // const cpassword=document.getElementById('cpassword').value;
     const Checkbtn=document.getElementById("check");
 
     console.log(Checkbtn);
@@ -37,19 +46,21 @@ function Register() {
       "name":name,
       "email":email,
       "password":password,
-      "cpassword":cpassword,
+      "cpassword":password,
       "isAdmin":0
     }
     try{
       const response=await axios.post("http://localhost:3001/api/users/register/",Data);
       console.log(response);
-      setResponseMsg({ type: "success", msg: "Verification Link send to Email" });
+      // setResponseMsg({ type: "success", msg: "Verification Link send to Email" });
+      notifySuccess("Verification Link send to Email" );
     }
     catch(error){
-      setResponseMsg({
-        type: "danger",
-        msg: error.response?.data?.message || "An error occurred during Register.",
-      });
+      notifyDanger(error.response?.data?.message || "An error occurred during Register.");
+      // setResponseMsg({
+      //   type: "danger",
+      //   msg: error.response?.data?.message || "An error occurred during Register.",
+      // });
     }
 
     }
@@ -72,27 +83,22 @@ function Register() {
 
   }
   return (
-    <div class="container-fluid">
+    <div class="container-fluid register">
       <div class="row">
-        <div class="col-md-5 side_form">
-          {/* <img
-            src="https://cdn-icons-png.flaticon.com/512/219/219969.png"
-            alt=""
-          ></img> */}
-          <h3>Register Form</h3>
-          <p>
-            Register with Recipe Jhalak to receive the most recent recipes and
-            information on website updates. Register by completing the form.
-          </p>
-          <a href="">Terms & Condition</a>
+        <div class="side_form col-md-6">
+          <img src="https://img.freepik.com/free-photo/exploding-burger-with-vegetables-melted-cheese-black-background-generative-ai_157027-1734.jpg?size=626&ext=jpg&ga=GA1.1.1700460183.1713139200&semt=ais"></img>
         </div>
 
         <form
-          class="register_form my-5 col-md-7"
+          class="register_form col-md-6"
           autocomplete="off"
           onSubmit={handleSubmit}
         >
           <h3>Fill out this form</h3>
+          <p>
+            Register with Recipe Jhalak to receive the most recent recipes and
+            information on website updates. Register by completing the form.
+          </p>
           {/* <label for="" class="form-label">
             Name
           </label> */}
@@ -105,7 +111,7 @@ function Register() {
           <div class="input-group mb-3 my-3">
             <div class="input-group-prepend">
               <span class="input-group-text" id="basic-addon1">
-                Name
+              <BsPersonCircle />
               </span>
             </div>
             <input
@@ -143,14 +149,14 @@ function Register() {
               class="form-control"
               placeholder="Password"
             />
-            <div class="input-group-append">
+            {/* <div class="input-group-append">
               <span class="input-group-text" id="basic_addon1" onClick={handleShowpassword}>
                 Show Password
               </span>
-            </div>
+            </div> */}
           </div>
           {PasswordErr?<div class="my-2 text-danger">Password is not matched</div>:<div></div>}
-          <div class="input-group mb-3">
+          {/* <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text" id="basic-addon1">
                 Confirm Password
@@ -164,7 +170,7 @@ function Register() {
               placeholder="Confirm Password"
               onInput={handlePasswordMatch}
             />
-          </div>
+          </div> */}
           {/* <input type="text" name="name" id="name" class="form-control"/> */}
           {/* <label for="" class="form-label">
             Email id

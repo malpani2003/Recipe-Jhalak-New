@@ -1,17 +1,22 @@
 
-.container-fluid {
+/* .container-fluid {
     background-color: #f6f7fb;
+    min-height: 7vh;
+  } */
+  .register{
+    display: flex;
+    align-items: center;
+    min-height: 67vh;
+    justify-content: center;
   }
-  
   .register_form {
-    width: 45%;
     margin: auto;
-    margin-top: 100px;
-    height: fit-content;
+    width: 80%; /* Adjust width as needed */
+    max-width: 500px; /* Added max-width to prevent form from becoming too wide */
+    padding: 20px; /* Added padding for better spacing */
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
-    padding: 20px;
     box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
   }
   
@@ -20,11 +25,11 @@
   }
   
   .side_form {
-    background-color: #ffc107;
-    color: #333; /* Darken text color for better contrast */
-    text-align: center;
-    font-weight: bold;
-    padding: 30px; /* Add padding for better spacing */
+    /* width: 100%; */
+    /* background-image: url("https://img.freepik.com/free-photo/exploding-burger-with-vegetables-melted-cheese-black-background-generative-ai_157027-1734.jpg?size=626&ext=jpg&ga=GA1.1.1700460183.1713139200&semt=ais"); */
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
   }
   
   .side_form h3 {

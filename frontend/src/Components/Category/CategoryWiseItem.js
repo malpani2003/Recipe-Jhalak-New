@@ -47,7 +47,7 @@ function CategoryWiseItem() {
 
   return (
     <div className={`container ${styles["popular-category"]}`}>
-      <h2 className="text-center my-3">Results for {foodItem.categoryName}</h2>
+      <h2 className="text-center mt-5">Results for {foodItem.categoryName}</h2>
       <div className={`row ${styles.category}`}>
         {foodItem.foodList.length >= 1 ? (
           foodItem.foodList.map((item) => {
@@ -65,7 +65,9 @@ function CategoryWiseItem() {
             );
           })
         ) : (
-          <div>No recipe Found 404 Error</div>
+          <>
+            <div className="text-center my-4">Uh oh, it seems there are no recipes matching your search</div>
+            <RelatedSearch></RelatedSearch></>
         )}
       </div>
       <Pagination
@@ -77,6 +79,28 @@ function CategoryWiseItem() {
   );
 }
 
+const RelatedSearch = () => {
+  return (
+    <div>
+      <h4>Related Search</h4>
+      <div className="row">
+        <div className="col-md-6">
+          hi
+        </div>
+        <div className="col-md-6">
+          hi
+        </div>
+        <div className="col-md-6">
+          hi
+        </div>
+        <div className="col-md-6">
+          ji
+        </div>
+
+      </div>
+    </div>
+  );
+}
 const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
   const pageNumbers = [];
 

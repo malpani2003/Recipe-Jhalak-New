@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import './Login.css'
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -52,7 +53,8 @@ function Login() {
           autoComplete="off"
           onSubmit={handleSubmit}
         >
-          <h1 className="mt-3 text-center">Login form</h1>
+          <h1 className="mt-2">Welcome Back</h1>
+          <p className="mt-3">Sign in with Email and Password</p>
           {responseMsg && (
             <div className={`alert alert-${responseMsg.type}`} role="alert">
               {responseMsg.msg}
@@ -111,7 +113,7 @@ function Login() {
             value="Cancel"
             className="btn btn-outline-danger mx-2 my-3"
           />
-          <h5>
+          <h5 className="mt-2">
             New User? <a href="/register">Register here</a>
           </h5>
         </form>

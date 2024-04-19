@@ -1,7 +1,7 @@
 import React from "react";
 import './Footer.css'
 function Footer() {
- return( <footer class="container-fluid bg-dark mb-0 mt-3 pb-3 text-white p-3">
+ return( <footer class="container-fluid bg-dark pb-3 text-white p-3">
     <div class="row">
       <div class="col-md-6">
         <h2 class="text-warning">Recipe Jhalak</h2>

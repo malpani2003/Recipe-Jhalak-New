@@ -1,11 +1,12 @@
 .App {
     display: flex;
+    min-height: 67vh;
   }
   
   .sidebar {
     width: 30%;
     background-color: #f1f1f1;
-    padding: 20px;
+    padding: 10px;
     box-sizing: border-box;
   }
   
@@ -49,9 +50,9 @@
     background-color: #fff;
     border-radius: 8px;
   }
-  
+ 
   .profileHeader {
-    display: flex;
+    /* display: flex; */
     align-items: center;
     margin-bottom: 20px;
   }
@@ -60,10 +61,12 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
+    display: block;
     margin-right: 20px;
     object-fit: cover;
-    border: 4px solid #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: auto;
+    border: 3px solid #fff;
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
   }
   
   .profileInfo {
@@ -85,5 +88,8 @@
     color: #555;
   }
   
-
-  
+  @media only screen and (max-width: 1000px) {
+    .sidebar{
+      display: none;
+    }
+  }

@@ -10,6 +10,7 @@ function ShowCategory() {
   const [error, setError] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const [sortParams, setSortParams] = useSearchParams();
+  // const []
 
   useEffect(() => {
     const fetchData = async () => {

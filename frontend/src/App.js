@@ -13,6 +13,9 @@ import Filter from "./Components/Filter/Filter";
 import FoodForm from "./Components/Food/FoodForm";
 import UserProfile from "./Components/Profile/UserProfile";
 import Index from "./Components/Home/Index";
+import SearchFood from "./Components/Food/SearchFood";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -25,6 +28,7 @@ function App() {
           <Route path="/food/add" element={<FoodForm />} />
           <Route path="/category" element={<ShowCategory />} />
           <Route path="/food/:foodId" element={<NewRecipePage />} />
+          <Route path="/food" element={<SearchFood />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/filter" element={<Filter />} />
@@ -33,6 +37,7 @@ function App() {
         </Routes>
         <Footer />
       </BrowserRouter>
+      <ToastContainer></ToastContainer>
     </div>
   );
 }

@@ -26,12 +26,20 @@ const addCategory = async (request, response) => {
 
 const getAllCategory = async (request, response) => {
   try {
-    const allCategories = await Category_Collection.find();
-    console.log(allCategories)
-    return response.status(200).json(allCategories);
+    let allCategories;
+    // console.log(request)
+    if (request.query && request.query["item"]) {
+      const itemNameRegex = new RegExp(request.query["item"], "i");
+      allCategories = await Category_Collection.find({ name: itemNameRegex });
+    } else {
+      allCategories = await Category_Collection.find();
+    }
+
+    console.log(allCategories);
+    return response.status(200).json(allCategories || []);
   } catch (error) {
     return response
-      .status(500) 
+      .status(500)
       .json({ error: `Internal Server Error ${error.message}` });
   }
 }

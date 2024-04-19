@@ -6,12 +6,14 @@
         border-radius: 30px;
 } */
 
-/* .container {
+.container {
   padding: 20px;
-} */
+}
 
 .popular-category {
-   min-height: 60vh;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .popular-category h2 {

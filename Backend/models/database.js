@@ -95,7 +95,7 @@ const userSchema = new mongoose.Schema({
   },
   LikedRecipe: {
     type: [String],
-    default: [],
+    default: [], 
   },
   TotalComments: {
     type: Number,

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import './Login.css'
+import { FaRegUserCircle } from "react-icons/fa";
+import { RiLockPasswordLine } from "react-icons/ri";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -64,7 +66,7 @@ function Login() {
           <div className="input-group mb-3">
             <div className="input-group-prepend">
               <span className="input-group-text" id="basic-addon1">
-                Email Id
+                <FaRegUserCircle />
               </span>
             </div>
             <input
@@ -81,7 +83,7 @@ function Login() {
           <div className="input-group mb-3">
             <div className="input-group-prepend">
               <span className="input-group-text" id="basic-addon1">
-                Password
+              <RiLockPasswordLine />
               </span>
             </div>
             <input

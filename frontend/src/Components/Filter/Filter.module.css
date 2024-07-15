@@ -23,3 +23,6 @@
     }
   }
   
+.filterContainer{
+  min-height: 67vh;
+}

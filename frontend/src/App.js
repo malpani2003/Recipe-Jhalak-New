@@ -16,6 +16,7 @@ import Index from "./Components/Home/Index";
 import SearchFood from "./Components/Food/SearchFood";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NewProfile from "./Components/Profile/NewUserProfile";
 
 function App() {
   return (
@@ -32,7 +33,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/filter" element={<Filter />} />
-          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/profile" element={<NewProfile></NewProfile>} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
         <Footer />

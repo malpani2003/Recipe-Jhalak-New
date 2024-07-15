@@ -3,10 +3,10 @@ const validator=require("validator");
 mongoose.set("strictQuery", false);
 
 
-// const url = "mongodb://127.0.0.1:27017/RecipeApp";
+const url = "mongodb://127.0.0.1:27017/RecipeApp";
 
 // const url="mongodb://localhost:27017/RecipeApp"
-const url = "mongodb+srv://pranavmaheshwari123:DWmyNYsOIlTP9jaU@cluster0.vzvevlk.mongodb.net/RecipeApp";
+// const url = "mongodb+srv://pranavmaheshwari123:DWmyNYsOIlTP9jaU@cluster0.vzvevlk.mongodb.net/RecipeApp";
 
 mongoose
   .connect(url)
@@ -25,6 +25,7 @@ const categorySchema = new mongoose.Schema({
   },
   Category_Img: String,
   Category_Desc: String,
+  TotalRecipe:Number
 },{
   timestamps:true
 });

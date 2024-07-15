@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import styles from "./Filter.module.css";
+import Loading from "../common/Loading";
 function Filter() {
   const [param, setParams] = useSearchParams();
   const [filterResult, setfilterResult] = useState([]);
@@ -15,7 +16,7 @@ function Filter() {
         );
         setfilterResult(response.data);
         setLoading(false);
-        // console.log(response);
+        console.log(response);
       } catch (err) {
         // console.log(err);
         setError(err.message);
@@ -26,20 +27,18 @@ function Filter() {
   }, [param]);
 
   if (loading) {
-    return (
-      <div className={`${styles.spinner_container}`}>
-        <div className={`${styles.loading_spinner}`}></div>
-      </div>
-    );
+    return <Loading></Loading>
   }
   if (error) {
-    return <>Error...</>;
+    return <>Error... {error}</>;
   }
   return (
-    <div>
-      {filterResult.map((item, index) => (
-        <p key={index}>{item}</p>
-      ))}
+    <div className={styles.filterContainer}>
+     {filterResult.length > 0 ? (
+        filterResult.map((item, index) => <p key={index}>{item}</p>)
+      ) : (
+        <div>No Data Found</div>
+      )}
     </div>
   );
 }

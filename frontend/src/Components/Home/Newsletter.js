@@ -9,7 +9,7 @@ function Newsletter() {
       <p>Enjoy weekly handpicked recipes and recommendations.</p>
       <form className={styles.newsletterForm}>
         <input type="email" placeholder="Email address" className={styles.formControl} />
-        <input type="submit" value="Join" className={`btn btn-dark ${styles.submitButton}`} />
+        {/* <input type="submit" value="Join" className={`btn btn-dark ${styles.submitButton}`} /> */}
       </form>
     </div>
   );

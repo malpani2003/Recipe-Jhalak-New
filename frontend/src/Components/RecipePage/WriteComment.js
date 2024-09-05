@@ -1,92 +1,112 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { FaUser, FaPaperPlane } from "react-icons/fa";
 
-function WriteComment({ id }) {
+const WriteComment = ({ id }) => {
   const [comment, setComment] = useState("");
   const [submissionMessage, setSubmissionMessage] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  async function handleCommentFormSubmit(e) {
+  useEffect(() => {
+    const authToken = localStorage.getItem("authToken");
+    setIsAuthenticated(!!authToken);
+  }, []);
+
+  const handleCommentFormSubmit = async (e) => {
     e.preventDefault();
     if (comment.trim() !== "") {
-      // Simulating a successful submission
-      setSubmissionMessage({
-        type: "success",
-        text: "Comment submitted successfully!",
-      });
-      const json = {
-        comment: comment,
-        foodId: id,
-        date: new Date().toISOString(),
-      };
-      const config = {
-        headers: {
-          Auth: localStorage.getItem("authToken"), // Assuming your authentication token is a Bearer token
-          // Add other headers if needed
-        },
-      };
       try {
         const response = await axios.post(
           `http://localhost:3001/api/food/${id}`,
-          json,
-          config
+          {
+            comment: comment,
+            foodId: id,
+            date: new Date().toISOString(),
+          },
+          {
+            headers: {
+              Auth: localStorage.getItem("authToken"),
+            },
+          }
         );
+        setSubmissionMessage({
+          type: "success",
+          text: "Comment submitted successfully!",
+        });
+        setComment("");
         console.log(response);
-        // console.log(json);
-        setComment(""); // Clear the comment after submission if needed
       } catch (err) {
-        console.log("Error Occurred", err.me);
+        setSubmissionMessage({
+          type: "danger",
+          text: "Error submitting comment. Please try again.",
+        });
+        console.log("Error Occurred", err.message);
       }
-      // Add logic to send the comment to the server or update state
     } else {
       setSubmissionMessage({
-        type: "danger",
+        type: "warning",
         text: "Please enter a valid comment before submitting.",
       });
     }
-  }
+  };
 
-  function handleChangeText(e) {
-    const { value } = e.target;
-    setComment(value);
-  }
+  const handleChangeText = (e) => {
+    setComment(e.target.value);
+  };
 
   return (
-    <div className="my-4">
-      <div className="d-flex flex-row justify-content">
-        <h2 className="fw-bold">Write a Comment</h2>
-        {localStorage.getItem("authToken") ? (
-          <></>
-        ) : (
-          <p>
-            <Link to="/login" className="text-danger fw-bold">
-              Login
-            </Link>{" "}
-          </p>
-        )}
-      </div>
+    <div className="my-4 p-4 bg-light rounded shadow-sm">
+      <h2 className="fw-bold mb-4">
+        <FaUser className="me-2" />
+        Write a Comment
+      </h2>
+
       {submissionMessage && (
-        <div className={`alert alert-${submissionMessage.type}`} role="alert">
+        <div
+          className={`alert alert-${submissionMessage.type} alert-dismissible fade show`}
+          role="alert"
+        >
           {submissionMessage.text}
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+            onClick={() => setSubmissionMessage(null)}
+          ></button>
         </div>
       )}
-      <form onSubmit={handleCommentFormSubmit}>
-        <textarea
-          className="form-control mt-3"
-          id="comment"
-          rows="5"
-          onChange={handleChangeText}
-          style={{ resize: "none" }}
-          placeholder="Enter your comment here..."
-          value={comment}
-        ></textarea>
-        <button type="submit" className="btn btn-warning my-3">
-          Post Comment
-        </button>
-      </form>
+
+      {isAuthenticated ? (
+        <form onSubmit={handleCommentFormSubmit}>
+          <div className="mb-3">
+            <textarea
+              className="form-control"
+              id="comment"
+              rows="4"
+              onChange={handleChangeText}
+              value={comment}
+              placeholder="Share your thoughts on this recipe..."
+              style={{ resize: "none" }}
+            ></textarea>
+          </div>
+          <button type="submit" className="btn btn-primary w-25">
+            <FaPaperPlane className="me-2" />
+            Post Comment
+          </button>
+        </form>
+      ) : (
+        <div className="alert alert-info" role="alert">
+          Please
+          <Link to="/login" className="alert-link">
+            login
+          </Link>
+          to post a comment.
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default WriteComment;

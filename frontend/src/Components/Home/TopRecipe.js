@@ -39,19 +39,26 @@ function TopRecipe() {
     console.log(response);
   };
   return (
-    <div className="container mb-5">
+    <div className="container-fluid px-5  mb-5">
       <h2 className="fw-bold my-3">Top Most Liked Recipe</h2>
       <div className={`row ${styles["recipeContainer"]}`}>
         {recipe.map((item, index) => (
           <div
-            className={`col-lg-3 col-md-4 col-6 ${styles["latestRecipeItem"]}`}
+            className={`col-lg-3 col-md-6 col-6 ${styles["latestRecipeItem"]}`}
             key={index}
           >
-            <img
-              src={item.foodImg}
-              alt={item.Category_Name}
-              className="w-100 rounded"
-            ></img>
+            <div style={{ display: "flex", width: "100%", height: "300px" }}>
+              <img
+                src={item.foodImg}
+                alt={item.Category_Name}
+                style={{
+                  minWidth: "100%",
+                  maxHeight: "100%",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                }}
+              />
+            </div>
             <div
               className={`d-flex flex-row justify-content-between ${styles["itemLinkContainer"]}`}
             >

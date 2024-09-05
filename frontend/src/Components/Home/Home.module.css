@@ -73,7 +73,7 @@
     height: auto;
   }
   .latestRecipeItem{
-    margin-top: 20px;
+    margin-top: 0px;
   }
   /* .recipeContainer{
     display: flex;
@@ -84,7 +84,7 @@
   
   .likeText{
     margin-top: 10px;
-    cursor: pointer;
+    cursor: pointer; 
   }
 
   .newsletterContainer {

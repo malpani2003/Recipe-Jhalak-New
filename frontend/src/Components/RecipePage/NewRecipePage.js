@@ -139,71 +139,53 @@ function NewRecipePage() {
     };
     fetchData();
   }, [foodId]);
+  if (loading) return <Loading />;
+  if (error) return <h2>Error Occurred: {error}</h2>;
+  if (!recipe) return null;
   // console.log(recipeIngredients,recipeInstructions);
   return (
     <div className="container-fluid">
-      {!error ? (
-        <>
-          {loading ? (
-            <Loading></Loading>
+      <RecipeHeader recipeData={recipe}></RecipeHeader>
+      <div className="row">
+        <div className="col-md-5">
+          {recipeIngredients.length >= 0 ? (
+            <Ingrediants recipe={recipeIngredients}></Ingrediants>
           ) : (
             <>
-              {/* <RecipeHeader recipeData={recipe}></RecipeHeader> */}
-              <RecipeFeature recipe={recipe}></RecipeFeature>
-              <div className="row">
-                <div className="col-md-5">
-                  {/* <div>{recipeInstructions}</div> */}
-                  {recipeIngredients.length >= 0 ? (
-                    <Ingrediants recipe={recipeIngredients}></Ingrediants>
-                  ) : (
-                    <>
-                      <h2 className="my-3 fw-bold">Ingrediants Required</h2>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: recipeIngredients[0],
-                        }}
-                      ></div>
-                    </>
-                  )}
-                </div>
-                <div className="col-md-7">
-                  {/* <pre>{recipeIngredients}</pre> */}
-                  {recipeInstructions.length == 1 ? (
-                    <>
-                      <h2 className="my-3 fw-bold">Recipe to Cook Food</h2>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: recipeInstructions[0],
-                        }}
-                      ></div>
-                    </>
-                  ) : (
-                    <RecipeInstructions
-                      recipeInstructions={recipeInstructions}
-                    ></RecipeInstructions>
-                  )}
-                </div>
-              </div>
-
-              <RecipeReview
-                comment={recipe["FoodDetails"]["comments"]}
-              ></RecipeReview>
-              <WriteComment id={recipe["FoodDetails"]["_id"]}></WriteComment>
-
-              {FoodFromCategory.length > 4 ? (
-                <SimilarFoodItem
-                  similarFood={FoodFromCategory}
-                ></SimilarFoodItem>
-              ) : (
-                <div></div>
-              )}
+              <h2 className="my-3 fw-bold">Ingrediants Required</h2>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: recipeIngredients[0],
+                }}
+              ></div>
             </>
           )}
-        </>
+        </div>
+        <div className="col-md-7">
+          {recipeInstructions.length == 1 ? (
+            <>
+              <h2 className="my-3 fw-bold">Recipe to Cook Food</h2>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: recipeInstructions[0],
+                }}
+              ></div>
+            </>
+          ) : (
+            <RecipeInstructions
+              recipeInstructions={recipeInstructions}
+            ></RecipeInstructions>
+          )}
+        </div>
+      </div>
+
+      <RecipeReview comment={recipe["FoodDetails"]["comments"]}></RecipeReview>
+      <WriteComment id={recipe["FoodDetails"]["_id"]}></WriteComment>
+
+      {FoodFromCategory.length > 4 ? (
+        <SimilarFoodItem similarFood={FoodFromCategory}></SimilarFoodItem>
       ) : (
-        <>
-          <h2>Error Occurred : {error}</h2>
-        </>
+        <div></div>
       )}
     </div>
   );

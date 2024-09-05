@@ -1,134 +1,151 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import styles from "./UserProfile.module.css";
-import { redirect, useNavigation } from 'react-router-dom'
-import Avatar from 'react-avatar';
-import Hamburger from 'hamburger-react'
+import { useNavigate } from "react-router-dom";
+import Avatar from "react-avatar";
+import { FaHeart, FaBookmark, FaTimes } from "react-icons/fa";
 
 const UserProfile = () => {
   const [selectedTab, setSelectedTab] = useState("liked");
   const [recipes, setRecipes] = useState([]);
   const [userData, setUserData] = useState(null);
-  const [authToken, setAuthToken] = useState(null);
-  const [show, setShow] = useState(0);
+  const [isOpen, setIsOpen] = useState(true);
+  const navigate = useNavigate();
 
-  // const navigate = useNavigation();
-
-  // if(!userData){
-  //   redirect("/")
   useEffect(() => {
-    const getToken = () => {
-      const authToken = localStorage.getItem("authToken");
-      // console.log(authToken)
-      setAuthToken(authToken);
+    const authToken = localStorage.getItem("authToken");
+    if (!authToken) {
+      navigate("/login");
+      return;
     }
-    getToken();
-  }, [show])
-  // }
-  useEffect(() => {
-    // if (!authToken) {
-    //   navigate("/login");
-    //   return;
-    // }
-
 
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/users/profile", {
-          withCredentials: true
-        });
-        console.log(response);
+        const response = await axios.get(
+          "http://localhost:3001/api/users/profile",
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+            withCredentials: true,
+          }
+        );
         setUserData(response.data.message);
+        fetchRecipes("liked");
       } catch (error) {
         console.error("Error fetching profile data:", error);
       }
     };
 
     fetchData();
-  }, [authToken]);
+  }, [navigate]);
 
-  const showLikedRecipes = () => {
-    const likedRecipes = ["Liked Recipe 1", "Liked Recipe 2", "Liked Recipe 3"];
-    setRecipes(likedRecipes);
-    setSelectedTab("liked");
+  const fetchRecipes = async (type) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/api/users/${type}recipes`,
+        {
+          withCredentials: true,
+        }
+      );
+      setRecipes(response.data);
+      setSelectedTab(type);
+    } catch (error) {
+      console.error(`Error fetching ${type} recipes:`, error);
+    }
   };
-
-  const showSavedRecipes = () => {
-    const savedRecipes = ["Saved Recipe A", "Saved Recipe B", "Saved Recipe C"];
-    setRecipes(savedRecipes);
-    setSelectedTab("saved");
-  };
-
 
   return (
-    <div className={styles.App}>
-      {/* <button onClick={()=>setShow(1)}>Click Here</button> */}
-      {userData && <Sidebar
-        showLikedRecipes={showLikedRecipes}
-        showSavedRecipes={showSavedRecipes}
-        userData={userData}
+    <div className="d-flex">
+      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} userData={userData} />
+      <Content
+        recipes={recipes}
+        selectedTab={selectedTab}
+        setSelectedTab={setSelectedTab}
+        fetchRecipes={fetchRecipes}
       />
-      }      <Content recipes={recipes} selectedTab={selectedTab} />
     </div>
   );
 };
-const Sidebar = ({ showLikedRecipes, showSavedRecipes, userData }) => {
-  const [showAvatar, setShowAvatar] = useState(true);
-  const [isOpen, setOpen] = useState(true);
-  const handleMouseEnter = () => {
-    setTimeout(() => {
-      console.log("Enter");
-      setShowAvatar(false);
-    }, 600);
-  }
+
+const Sidebar = ({ isOpen, setIsOpen, userData }) => {
+  if (!isOpen)
+    return (
+      <button className="btn btn-primary m-2" onClick={() => setIsOpen(true)}>
+        <FaBookmark />
+      </button>
+    );
 
   return (
-    <>
-      {isOpen &&
-        <div className={styles.sidebar}>
-          <div className={styles.profileHeader}>
-            {/* <img
-        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLKcbjWaX2RL8_ZJWTf276BAKWIe_TDoKLg&usqp=CAU"
-        alt="User Profile"
-        className={styles.profileImage}
-      /> */}
-            {showAvatar &&
-              <div>
-                <Avatar name={userData["Name"] || "Pranav"} round={true} size="100" className={styles.profileImage} />
-              </div>
-              }
-            {/* <div className={styles.profileInfo}>
-              <h2 className={styles.profileName}>{userData["Name"] || "Pranav"}</h2>
-            </div> */}
-          </div>
-          <div className={styles.profileDetails}>
-            <p className={styles.detailItem}>
-              <strong>Email:</strong> {userData["Email_id"] || "Pranav"}
-            </p>
-            <p className={styles.detailItem}>
-              <strong>Member Since:</strong> {userData["createdAt"].split("T")[0] || "Pranav"}
-            </p>
-            <p className={styles.detailItem}>
-              <span className={`${userData["Verified"] ? "text-success" : "text-danger"} fw-bold`}>{userData["Verified"] ? "Verified User" : "Not Verified User"}</span>
-            </p>
-          </div>
-          <button onClick={showLikedRecipes}>Liked Recipes</button>
-          <button onClick={showSavedRecipes}>Saved Recipes</button>
-        </div>}
-      <Hamburger toggled={isOpen} size={10} toggle={setOpen} />
-    </>
-  )
+    <div
+      className="sidebar bg-light p-3"
+      style={{ width: "300px", height: "100vh" }}
+    >
+      <div className="d-flex justify-content-between mb-4">
+        <h2>Profile</h2>
+        <button className="btn btn-light" onClick={() => setIsOpen(false)}>
+          <FaTimes />
+        </button>
+      </div>
+      <div className="text-center mb-4">
+        <Avatar name={userData?.Name || "User"} round={true} size="100" />
+        <h3 className="mt-3">{userData?.Name || "User"}</h3>
+      </div>
+      <div className="mb-4">
+        <p>
+          <strong>Email:</strong> {userData?.Email_id}
+        </p>
+        <p>
+          <strong>Member Since:</strong> {userData?.createdAt?.split("T")[0]}
+        </p>
+        <p
+          className={`${
+            userData?.Verified ? "text-success" : "text-danger"
+          } fw-bold`}
+        >
+          {userData?.Verified ? "Verified User" : "Not Verified User"}
+        </p>
+      </div>
+    </div>
+  );
 };
-
-const Content = ({ recipes, selectedTab }) => (
-  <div className={styles.content}>
-    <ul className={styles.recipe_list}>
-      {recipes.map((recipe, index) => (
-        <li key={index}>{recipe}</li>
-      ))}
-    </ul>
+const Content = ({ recipes, selectedTab, setSelectedTab, fetchRecipes }) => (
+  <div className="flex-grow-1 p-4">
+    <div className="d-flex justify-content-between align-items-center mb-4">
+      <h2>{selectedTab === "liked" ? "Liked Recipes" : "Saved Recipes"}</h2>
+      <div className="d-flex align-items-center">
+        <FaHeart
+          className={`me-2 ${
+            selectedTab === "liked" ? "text-danger" : "text-muted"
+          }`}
+        />
+        <div className="form-check form-switch">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id="flexSwitchCheckDefault"
+            checked={selectedTab === "saved"}
+            onChange={() =>
+              fetchRecipes(selectedTab === "liked" ? "saved" : "liked")
+            }
+            style={{ width: "3rem", height: "1.5rem" }}
+          />
+        </div>
+        <FaBookmark
+          className={`ms-2 ${
+            selectedTab === "saved" ? "text-primary" : "text-muted"
+          }`}
+        />
+      </div>
+    </div>
+    {recipes.length === 0 ? (
+      <p>No {selectedTab} recipes found.</p>
+    ) : (
+      <ul className="list-group">
+        {recipes.map((recipe, index) => (
+          <li key={index} className="list-group-item">
+            {recipe.name}
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
 );
-
-
 export default UserProfile;

@@ -9,8 +9,6 @@ router.get("/food/:category_id",categoryControllers.getFoodForCategory);
 router.get("/all",categoryControllers.getAllCategory);
 
 
-// router.get("/all",categoryControllers.getCategory);
-
 
   
 module.exports=router;

@@ -131,8 +131,10 @@ const registerUser = async (request, response) => {
       return response.status(400).send({ error: true, message: "User cannot be Registered" });
     }
     console.log(result)
-    const isVerificationLinkSent = sendVerificationEmail(result);
+    const isVerificationLinkSent = await sendVerificationEmail(result);
+    console.log(isVerificationLinkSent)
     const tokenId = getToken(result._id);
+    console.log(tokenId)
     response.header("Auth", tokenId);
 
     const successMessage = isVerificationLinkSent ? "Registration Completed, Verification Link Sent on Email" : "Registration Completed";

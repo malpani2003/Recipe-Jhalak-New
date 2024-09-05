@@ -62,9 +62,8 @@ const getFoodForCategory = async (request, response) => {
     const categoryFoodItems = await Item_Collection.find({
       foodCategoryId: categoryId,
     }, { foodName: 1, previewImg: 1, foodImg: 1 }).limit(6).skip(skip);
-
     const jsonData = {
-      categoryName: categoryName,
+      categoryName: categoryName, 
       totalFoodItem: totalLength,
       foodList: categoryFoodItems,
     };

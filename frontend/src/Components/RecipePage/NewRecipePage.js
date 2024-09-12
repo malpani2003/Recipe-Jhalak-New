@@ -118,7 +118,7 @@ function NewRecipePage() {
         if (foodData && foodData["FoodDetails"]) {
           setLoading(false);
           setRecipe(foodData);
-          console.log(foodData);
+          // console.log(foodData);
           setRecipeIngredients(
             foodData["FoodDetails"]["foodIngrediants"] || []
           );
@@ -148,45 +148,39 @@ function NewRecipePage() {
       <RecipeHeader recipeData={recipe}></RecipeHeader>
       <div className="row">
         <div className="col-md-5">
-          {recipeIngredients.length >= 0 ? (
-            <Ingrediants recipe={recipeIngredients}></Ingrediants>
+          {recipeIngredients?.length ? (
+            <Ingrediants recipe={recipeIngredients[0]} />
           ) : (
             <>
-              <h2 className="my-3 fw-bold">Ingrediants Required</h2>
+              <h2 className="my-3 fw-bold">Ingredients Required</h2>
               <div
                 dangerouslySetInnerHTML={{
-                  __html: recipeIngredients[0],
+                  __html: recipeIngredients?.[0] || "No ingredients available.",
                 }}
-              ></div>
+              />
             </>
           )}
         </div>
         <div className="col-md-7">
-          {recipeInstructions.length == 1 ? (
+          {recipeInstructions?.length === 1 ? (
             <>
               <h2 className="my-3 fw-bold">Recipe to Cook Food</h2>
               <div
                 dangerouslySetInnerHTML={{
                   __html: recipeInstructions[0],
                 }}
-              ></div>
+              />
             </>
           ) : (
-            <RecipeInstructions
-              recipeInstructions={recipeInstructions}
-            ></RecipeInstructions>
+            <RecipeInstructions recipeInstructions={recipeInstructions} />
           )}
         </div>
       </div>
 
-      <RecipeReview comment={recipe["FoodDetails"]["comments"]}></RecipeReview>
-      <WriteComment id={recipe["FoodDetails"]["_id"]}></WriteComment>
+      {/* <RecipeReview comment={recipe["FoodDetails"]["comments"]}></RecipeReview>
+      <WriteComment id={recipe["FoodDetails"]["_id"]}></WriteComment> */}
 
-      {FoodFromCategory.length > 4 ? (
-        <SimilarFoodItem similarFood={FoodFromCategory}></SimilarFoodItem>
-      ) : (
-        <div></div>
-      )}
+      {/* <SimilarFoodItem similarFood={FoodFromCategory}></SimilarFoodItem> */}
     </div>
   );
 }

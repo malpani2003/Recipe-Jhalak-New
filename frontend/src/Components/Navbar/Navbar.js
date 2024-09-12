@@ -1,128 +1,101 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./Navbar.css";
-function SearchForm() {
-  const navigate = useNavigate();
-
-  const handleSearch = (event) => {
-    event.preventDefault();
-    const searchTerm = event.target.fsearch.value;
-    if (searchTerm.trim() !== "") {
-      navigate(`/food?item=${searchTerm}`);
-    }
-  };
-
-  return (
-    <form className="d-flex justify-content-end mx-5" onSubmit={handleSearch}>
-      <input
-        className="form-control me-2"
-        type="search"
-        name="fsearch"
-        placeholder="Enter Food Name"
-      />
-      {/* <button className="btn btn-outline-warning" type="submit">
-        Search
-      </button> */}
-    </form>
-  );
-}
+import React from "react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
-  const [authToken, setAuthToken] = useState(localStorage.getItem("authToken"));
-
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    setAuthToken(null);
-  };
-
-  useEffect(() => {
-    setAuthToken(localStorage.getItem("authToken"));
-  }, []);
-
   return (
-    <>
-      <nav className="navbar navbar-expand-md bg-dark">
-        {/* <div className="container-fluid"> */}
-          <h2 className="fw-bold text-warning mx-1">Recipe Jhalak</h2>
-          {/* <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span> */}
-          {/* </button> */}
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav d-flex justify-content-center">
-              <div className="d-flex justify-content-around">
-                <li className="nav-item">
-                  <Link to="/" className="nav-link">
-                    Home
-                  </Link>
-                </li>
-                <li className="nav-item dropdown">
-                  <Link
-                    className="nav-link dropdown-toggle"
-                    to="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                  >
-                    Filter Recipe
-                  </Link>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <Link className="dropdown-item" to="/filter?name=area">
-                        Filter by Area
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="/filter?name=veg">
-                        Filter by Veg / Non-Veg
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-
-
-                {authToken ? (
-                  <>
-                    <li className="nav-item">
-                      <Link to="/profile" className="nav-link">
-                        Profile
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link className="nav-link" onClick={handleLogout}>
-                        Logout
-                      </Link>
-                    </li>
-                  </>
-                ) : (
-                  <>
-                    <li className="nav-item">
-                      <Link to="/login" className="nav-link">
-                        Login
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to="/register" className="nav-link">
-                        Register
-                      </Link>
-                    </li>
-                  </>
-                )}
-              </div>
-              <div>
-                {/* <SearchForm /> */}
-              </div>
-            </ul>
+    <nav className="bg-gray-900">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link to="/" className="flex-shrink-0">
+             <h1 className="text-2xl text-white font-bold">Recipe Jhalak</h1>
+            </Link>
           </div>
-        {/* </div> */}
-      </nav>
-    </>
+
+          {/* Navigation Links */}
+          <div className="hidden md:flex space-x-4">
+            <Link
+              to="/category"
+              className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Categories
+            </Link>
+            <Link
+              to="/contact"
+              className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Filter By
+            </Link>
+          </div>
+
+          {/* Sign In Button */}
+          <div className="hidden md:flex items-center">
+            <Link
+              to="/login"
+              className="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Sign In
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="-mr-2 flex md:hidden">
+            <button
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700"
+            >
+              <span className="sr-only">Open main menu</span>
+              {/* Mobile menu icon */}
+              <svg
+                className="h-6 w-6"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div className="md:hidden">
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <Link
+            to="/about"
+            className="text-white hover:text-gray-300 block px-3 py-2 rounded-md text-base font-medium"
+          >
+            About
+          </Link>
+          <Link
+            to="/services"
+            className="text-white hover:text-gray-300 block px-3 py-2 rounded-md text-base font-medium"
+          >
+            Services
+          </Link>
+          <Link
+            to="/contact"
+            className="text-white hover:text-gray-300 block px-3 py-2 rounded-md text-base font-medium"
+          >
+            Contact Us
+          </Link>
+        </div>
+        <div className="px-2">
+          <Link
+            to="/signin"
+            className="text-white bg-blue-600 hover:bg-blue-700 block px-4 py-2 rounded-md text-base font-medium"
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
+    </nav>
   );
 }
 

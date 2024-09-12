@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import styles from "./AllCategory.module.css";
 
 function ShowCategory() {
   const [category, setCategory] = useState([]);
@@ -10,7 +9,6 @@ function ShowCategory() {
   const [error, setError] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const [sortParams, setSortParams] = useSearchParams();
-  // const []
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +38,7 @@ function ShowCategory() {
       setFilterCategoryArr(sortedArr);
     };
     handleSorting();
-  },[category,sortParams.get("sortBy")]);
+  }, [filterCategoryArr, sortParams.get("sortBy")]);
 
   function handleSearchInput(event) {
     const searchName = event.target.value.toLowerCase();
@@ -52,100 +50,85 @@ function ShowCategory() {
   }
 
   function handleSortAsc() {
-    setSortParams({sortBy: 'asc' });
+    setSortParams({ sortBy: 'asc' });
   }
 
   function handleSortDesc() {
-      setSortParams({sortBy: 'desc' });
+    setSortParams({ sortBy: 'desc' });
   }
 
   if (loading) {
     return (
-      <div className="spinner_container">
-        <div className="loading_spinner"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="spinner-border animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   if (error) {
-    return <div style={{ height: '100%' }}>{error}</div>
+    return <div className="text-center text-red-600">{error}</div>
   }
 
   return (
-    <div className={`container-fluid`}>
-      <h1 className="mt-5 fw-bold">Categories Listed</h1>
-      <p className="my-3">
-        We proudly present a curated collection of culinary categories that
-        cater to every palate. From savory mains to delectable desserts, our
-        extensive range covers a myriad of cuisines, ensuring there's something
-        for everyone. Explore the rich tapestry of flavors and discover new
-        inspirations for your next kitchen adventure. Each category features a
-        delightful array of recipes, accompanied by mouthwatering images and
-        detailed descriptions.
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-3xl font-bold text-gray-800 mb-4">Categories Listed</h1>
+      <p className="text-gray-700 mb-6">
+        We proudly present a curated collection of culinary categories that cater to every palate. From savory mains to delectable desserts, our extensive range covers a myriad of cuisines, ensuring there's something for everyone. Explore the rich tapestry of flavors and discover new inspirations for your next kitchen adventure. Each category features a delightful array of recipes, accompanied by mouthwatering images and detailed descriptions.
       </p>
-      <div className="d-flex flex-md-row justify-content-between align-items-center mb-3">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <input
           type="text"
           name="scategory"
-          placeholder="Enter the Search Keyword"
+          placeholder="Search by keyword"
           id="scategory"
-          className="form-control w-25"
+          className="form-input w-full md:w-1/3 mb-4 md:mb-0 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           onInput={handleSearchInput}
         />
-        <div className="d-flex align-items-center">
-          <div className="dropdown me-2">
+        <div className="relative">
+          <button
+            className="btn btn-primary px-4 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none"
+            type="button"
+            id="categoryDropdownMenuButton"
+            aria-expanded="false"
+          >
+            Sort By
+          </button>
+          <div className="dropdown-menu absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
             <button
-              className="btn btn-secondary dropdown-toggle"
-              type="button"
-              id="categoryDropdownMenuButton"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+              onClick={handleSortAsc}
             >
-              Sort Name By
+              Sort Ascending
             </button>
-            <ul
-              className="dropdown-menu"
-              aria-labelledby="categoryDropdownMenuButton"
+            <button
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+              onClick={handleSortDesc}
             >
-              <li>
-                <button
-                  className="dropdown-item"
-                  onClick={handleSortDesc}
-                >
-                 Sort Descending
-                </button>
-              </li>
-              <li>
-                <button
-                  className="dropdown-item"
-                  onClick={handleSortAsc}
-                >
-                  Sort Ascending
-                </button>
-              </li>
-            </ul>
+              Sort Descending
+            </button>
           </div>
         </div>
       </div>
 
-      <div className={`${styles.category} row mt-3`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filterCategoryArr.map((element) => (
           <div
-            className={`${styles.category_item} col-md-4 col-12`}
+            className="bg-white rounded-lg shadow-lg overflow-hidden"
             key={element["_id"]}
           >
             <img
               src={element["Category_Img"]}
               alt={element["Category_Name"]}
-            ></img>
-            <div className={styles.category_details}>
+              className="w-full h-40 object-cover"
+            />
+            <div className="p-4">
               <Link
                 to={`/category/${element["_id"]}`}
-                className={styles.categories_name}
+                className="text-xl font-semibold text-gray-800 hover:text-teal-700"
               >
                 {element["Category_Name"]}
               </Link>
-              <p>{element["recipeListed"] || 120} Recipe</p>
+              <p className="text-gray-600 mt-2">{element["recipeListed"] || 120} Recipes</p>
             </div>
           </div>
         ))}

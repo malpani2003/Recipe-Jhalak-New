@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import styles from "./CategoryWise.module.css";
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Loading from "../common/Loading";
@@ -14,13 +13,11 @@ function CategoryWiseItem() {
   const [itemsPerPage] = useState(6); // Number of items per page
 
   useEffect(() => {
-
     async function getItems() {
       try {
         const response = await axios.get(
           `http://localhost:3001/api/category/food/${categoryID}?pageNum=${currentPage}`
         );
-        console.log(response.data)
         setFoodItem(response.data);
         setLoading(false);
       } catch (err) {
@@ -46,28 +43,38 @@ function CategoryWiseItem() {
   };
 
   return (
-    <div className={`container ${styles["popular-category"]}`}>
-      <h2 className="text-center mt-5">Results for {foodItem.categoryName}</h2>
-      <div className={`row ${styles.category}`}>
+    <div className="container mx-auto min-h-screen p-6">
+      <h2 className="text-center text-3xl font-bold mt-5 text-gray-800">
+        Results for {foodItem.categoryName}
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {foodItem.foodList.length >= 1 ? (
           foodItem.foodList.map((item) => {
             const { _id, foodName, foodImg } = item;
             return (
-              <div
-                className={`col-lg-4 col-md-6 col-10 ${styles["category-item"]}`}
-                key={_id}
-              >
-                <img src={foodImg} alt={foodName} />
-                <Link to={`/food/${_id}`} className={styles["food-item"]}>
-                  {foodName}
-                </Link>
+              <div key={_id} className="relative group">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                  <img
+                    src={foodImg}
+                    alt={foodName}
+                    className="w-full h-56 object-cover transition-transform duration-300 transform group-hover:scale-105"
+                  />
+                  <div className="p-4">
+                    <Link
+                      to={`/food/${_id}`}
+                      className="block text-lg font-bold text-gray-800 hover:text-red-500 transition-colors duration-200 text-center"
+                    >
+                      {foodName}
+                    </Link>
+                  </div>
+                </div>
               </div>
             );
           })
         ) : (
-          <>
-            <div className="text-center my-4">Uh oh, it seems there are no recipes matching your search</div>
-            <RelatedSearch></RelatedSearch></>
+          <div className="text-center my-4">
+            Uh oh, it seems there are no recipes matching your search
+          </div>
         )}
       </div>
       <Pagination
@@ -79,28 +86,6 @@ function CategoryWiseItem() {
   );
 }
 
-const RelatedSearch = () => {
-  return (
-    <div>
-      <h4>Related Search</h4>
-      <div className="row">
-        <div className="col-md-6">
-          hi
-        </div>
-        <div className="col-md-6">
-          hi
-        </div>
-        <div className="col-md-6">
-          hi
-        </div>
-        <div className="col-md-6">
-          ji
-        </div>
-
-      </div>
-    </div>
-  );
-}
 const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
   const pageNumbers = [];
 
@@ -110,10 +95,13 @@ const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
 
   return (
     <nav>
-      <ul className="pagination justify-content-center mt-3">
+      <ul className="flex justify-center mt-8">
         {pageNumbers.map((number) => (
-          <li key={number} className="page-item mx-2" >
-            <button onClick={() => paginate(number)} className="page-link bg-dark rounded-circle text-warning">
+          <li key={number} className="mx-1">
+            <button
+              onClick={() => paginate(number)}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-600 transition duration-300"
+            >
               {number}
             </button>
           </li>

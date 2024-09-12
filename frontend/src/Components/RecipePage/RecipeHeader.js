@@ -61,8 +61,8 @@ const RecipeHeader = ({ recipeData }) => {
         <img
           src={recipe.FoodDetails.previewImg}
           alt={recipe.FoodDetails.foodName}
-          className="w-100"
           style={{
+            width:"100%",
             height: "50vh",
             objectFit: "cover",
             filter: "brightness(50%)",

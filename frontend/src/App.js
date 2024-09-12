@@ -12,7 +12,7 @@ import ShowCategory from "./Components/Category/ShowCategory";
 import Filter from "./Components/Filter/Filter";
 import FoodForm from "./Components/Food/FoodForm";
 import UserProfile from "./Components/Profile/UserProfile";
-import Index from "./Components/Home/Index";
+import Index from "./Components/Category/Index";
 import SearchFood from "./Components/Food/SearchFood";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

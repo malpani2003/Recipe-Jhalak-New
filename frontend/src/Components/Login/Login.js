@@ -29,8 +29,8 @@ function Login() {
       );
 
       if (response.status === 200) {
-        const authToken = response.data["token"];
-        localStorage.setItem("authToken", authToken);
+        // const authToken = response.data["token"];
+        // localStorage.setItem("authToken", authToken);
         setResponseMsg({ type: "success", msg: "Login successful!" });
         navigate("/profile");
       } else {

@@ -8,7 +8,7 @@ module.exports = {
   addFood: async (request, response) => {
     try {
       const food = request.body;
-      console.log(food);
+      // console.log(food);
 
       const Instruction = food["food_Instruction"].trim();
       const Ingredient = food["Food_Ingrediants"].trim();
@@ -43,7 +43,7 @@ module.exports = {
   addFood2: async (request, response) => {
     try {
       const food = request.body;
-      console.log(food);
+      // console.log(food);
       food["isDrink"] = food["isDrink"] == "Yes" ? true : false;
       const newRecipe = new Item_Collection(food);
       const result = await newRecipe.save();
@@ -110,7 +110,7 @@ module.exports = {
   getSearchFoodItem: async (request, response) => {
     try {
       const foodName = request.query.fname;
-      console.log(foodName);
+      // console.log(foodName);
       const searchFoodItem = await Item_Collection.find({
         foodName: new RegExp(foodName, 'i'),
       });
@@ -194,7 +194,7 @@ module.exports = {
   },
 
   getFilterFoodData: async (request, response) => {
-    console.log(request.query);
+    // console.log(request.query);
     if (request.query["name"] == "area") {
       const result = await Item_Collection.distinct("foodArea");
       response.status(200).json(result);

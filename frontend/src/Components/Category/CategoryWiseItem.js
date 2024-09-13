@@ -72,7 +72,7 @@ function CategoryWiseItem() {
             );
           })
         ) : (
-          <div className="text-center my-4">
+          <div className="text-center my-7">
             Uh oh, it seems there are no recipes matching your search
           </div>
         )}

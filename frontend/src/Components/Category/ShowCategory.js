@@ -14,10 +14,12 @@ function ShowCategory() {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/api/category/all');
+        console.log('Fetched data:', response.data); // Debug: Check the data structure
         setCategory(response.data);
         setFilterCategoryArr(response.data);
         setLoading(false);
       } catch (error) {
+        console.error('Error fetching data:', error); // Debug: Check the error
         setError('Error fetching data. Please try again later.');
         setLoading(false);
       }
@@ -38,7 +40,7 @@ function ShowCategory() {
       setFilterCategoryArr(sortedArr);
     };
     handleSorting();
-  }, [filterCategoryArr, sortParams.get("sortBy")]);
+  }, [sortParams]);
 
   function handleSearchInput(event) {
     const searchName = event.target.value.toLowerCase();
@@ -111,27 +113,31 @@ function ShowCategory() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filterCategoryArr.map((element) => (
-          <div
-            className="bg-white rounded-lg shadow-lg overflow-hidden"
-            key={element["_id"]}
-          >
-            <img
-              src={element["Category_Img"]}
-              alt={element["Category_Name"]}
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4">
-              <Link
-                to={`/category/${element["_id"]}`}
-                className="text-xl font-semibold text-gray-800 hover:text-teal-700"
-              >
-                {element["Category_Name"]}
-              </Link>
-              <p className="text-gray-600 mt-2">{element["recipeListed"] || 120} Recipes</p>
+        {filterCategoryArr.length > 0 ? (
+          filterCategoryArr.map((element) => (
+            <div
+              className="bg-white rounded-lg shadow-lg overflow-hidden"
+              key={element["_id"]}
+            >
+              <img
+                src={element["Category_Img"]}
+                alt={element["Category_Name"]}
+                className="w-full h-40 object-cover"
+              />
+              <div className="p-4">
+                <Link
+                  to={`/category/${element["_id"]}`}
+                  className="text-xl font-semibold text-gray-800 hover:text-teal-700"
+                >
+                  {element["Category_Name"]}
+                </Link>
+                <p className="text-gray-600 mt-2">{element["recipeListed"] || 120} Recipes</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <div className="text-center text-gray-600">No categories found.</div>
+        )}
       </div>
     </div>
   );

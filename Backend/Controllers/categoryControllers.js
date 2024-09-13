@@ -35,7 +35,7 @@ const getAllCategory = async (request, response) => {
       allCategories = await Category_Collection.find();
     }
 
-    console.log(allCategories);
+    // console.log(allCategories);
     return response.status(200).json(allCategories || []);
   } catch (error) {
     return response
@@ -47,7 +47,7 @@ const getFoodForCategory = async (request, response) => {
   try {
     const categoryId = request.params.category_id.trim();
     const pageNum = request.query.pageNum.trim();
-    console.log(pageNum)
+    // console.log(pageNum)
     const categoryData = await Category_Collection.findById(categoryId);
 
     if (!categoryData) {

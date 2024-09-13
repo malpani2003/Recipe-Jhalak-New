@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { AiFillLike } from "react-icons/ai";
 import { IoStarSharp } from "react-icons/io5";
+import { ArrowBigDown } from "lucide-react";
 
 function LatestRecipe() {
   const [recipe, setRecipe] = useState([]);
@@ -62,11 +63,6 @@ function LatestRecipe() {
                 >
                   {item.foodName}
                 </Link>
-                <AiFillLike
-                  color="orange"
-                  className="cursor-pointer"
-                  onClick={() => handleLikeIncrement(item._id)}
-                />
               </div>
               <div className="flex">
                 {[...Array(Math.floor(Math.random() * 10))].map((_, starIndex) => (
@@ -144,11 +140,7 @@ function TopRecipe() {
                 >
                   {item.foodName}
                 </Link>
-                <AiFillLike
-                  color="orange"
-                  className="cursor-pointer"
-                  onClick={() => handleLikeIncrement(item._id)}
-                />
+
               </div>
               <div className="flex">
                 {[...Array(Math.floor(Math.random() * 10))].map((_, starIndex) => (
@@ -275,7 +267,7 @@ function Index() {
         alt="Banner"
         className="w-full h-96 object-cover mb-6"
       /> */}
-      <HeroSection></HeroSection>
+      {/* <HeroSection></HeroSection> */}
       <div className="container mx-auto px-4 mt-6">
         <h2 className="text-3xl font-bold mb-4">Popular Categories</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
@@ -302,7 +294,7 @@ function Index() {
             to="/category"
             className="btn btn-outline-dark border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white px-6 py-2 rounded-lg"
           >
-            Show All
+           <ArrowBigDown></ArrowBigDown>
           </Link>
         </div>
       </div>

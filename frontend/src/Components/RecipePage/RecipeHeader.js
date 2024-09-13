@@ -57,15 +57,15 @@ const RecipeHeader = ({ recipeData }) => {
 
   return (
     <div className="container-fluid p-0">
-      <div className="position-relative">
+      <div className="position-relative mt-3">
         <img
           src={recipe.FoodDetails.previewImg}
           alt={recipe.FoodDetails.foodName}
           style={{
             width:"100%",
-            height: "50vh",
+            height: "80vh",
             objectFit: "cover",
-            filter: "brightness(50%)",
+            filter: "brightness(40%)",
           }}
         />
         <div className="position-absolute top-50 start-50 translate-middle text-center text-white">

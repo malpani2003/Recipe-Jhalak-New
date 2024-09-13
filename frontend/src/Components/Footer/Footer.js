@@ -1,55 +1,38 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ChefHat, Search, Heart } from "lucide-react"
+import { ChefHat } from "lucide-react";
 
 function Footer() {
   return (
-    <footer className="w-full py-2 bg-gray-900 text-white">
-      <div className="container px-4 md:px-6 flex flex-col md:flex-row justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <ChefHat className="h-6 w-6" />
-          <span className="font-bold">RecipeFinder</span>
+    <footer className="w-full py-4 bg-gray-900 text-white mt-auto">
+      <div className="container px-2 mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="flex items-center space-x-2 mb-6 md:mb-0">
+            <ChefHat className="h-8 w-8 text-yellow-400" />
+            <span className="text-2xl font-bold">Recipe Jhalak</span>
+          </div>
+          <nav className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-0">
+            <Link to="/privacy" className="text-sm hover:underline">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="text-sm hover:underline">
+              Terms of Service
+            </Link>
+            <Link to="/contact" className="text-sm hover:underline">
+              Contact Us
+            </Link>
+            <Link to="/about" className="text-sm hover:underline">
+              About Us
+            </Link>
+          </nav>
         </div>
-        <nav className="flex items-center space-x-4 mt-4 md:mt-0">
-          <Link className="text-sm hover:underline" href="/privacy">
-            Privacy Policy
-          </Link>
-          <Link className="text-sm hover:underline" href="/terms">
-            Terms of Service
-          </Link>
-          <Link className="text-sm hover:underline" href="/contact">
-            Contact Us
-          </Link>
-        </nav>
+        <hr className="my-4 border-gray-700" />
+        <div className="text-center text-sm">
+          <p>&copy; {new Date().getFullYear()} Recipe Jhalak. All Rights Reserved.</p>
+          <p>Developed by Pranav Malpani</p>
+        </div>
       </div>
     </footer>
-    // <footer className="bg-gray-800 text-white py-6">
-    //   <div className="container mx-auto px-4">
-    //     <div className="flex flex-col md:flex-row justify-between items-center">
-    //       <div className="mb-6 md:mb-0">
-    //         <h2 className="text-3xl font-bold text-yellow-400 mb-2">Recipe Jhalak</h2>
-    //         <p className="text-lg">Recipe Dekh, Khana Bana</p>
-    //         <p className="text-sm mt-1">By - Pranav Malpani</p>
-    //       </div>
-    //       <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
-    //         <div>
-    //           <h3 className="text-xl font-semibold text-yellow-400 mb-2">Links</h3>
-    //           <ul className="flex flex-col space-y-2">
-    //             <li><Link to="/" className="hover:text-yellow-400">Home</Link></li>
-    //             <li><Link to="/#category" className="hover:text-yellow-400">Recipe by Categories</Link></li>
-    //             <li><Link to="/area" className="hover:text-yellow-400">Recipe by Area</Link></li>
-    //             <li><Link to="/contact" className="hover:text-yellow-400">Contact</Link></li>
-    //             <li><Link to="/faq" className="hover:text-yellow-400">FAQ</Link></li>
-    //           </ul>
-    //         </div>
-    //       </div>
-    //     </div>
-    //     <hr className="my-4 border-gray-600" />
-    //     <p className="text-center text-sm">
-    //       Terms & Conditions | Privacy Policy | Copyright &copy; {new Date().getFullYear()} Recipe Jhalak
-    //     </p>
-    //   </div>
-    // </footer>
   );
 }
 

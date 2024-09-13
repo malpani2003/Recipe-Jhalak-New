@@ -6,60 +6,65 @@ import { FaHeart, FaBookmark, FaTimes } from "react-icons/fa";
 
 const UserProfile = () => {
   const [selectedTab, setSelectedTab] = useState("liked");
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const authToken = localStorage.getItem("authToken");
-    if (!authToken) {
-      navigate("/login");
-      return;
-    }
-
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
           "http://localhost:3001/api/users/profile",
-          {
-            headers: { Authorization: `Bearer ${authToken}` },
-            withCredentials: true,
-          }
+          { withCredentials: true }
         );
         setUserData(response.data.message);
         fetchRecipes("liked");
       } catch (error) {
-        console.error("Error fetching profile data:", error);
+        setUserData(null);
+        setError("Unable to fetch profile data.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [navigate]);
 
+  if (!userData && !loading) {
+    navigate("/login");
+  }
+  
   const fetchRecipes = async (type) => {
+    setLoading(true);
     try {
       const response = await axios.get(
         `http://localhost:3001/api/users/${type}recipes`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       setRecipes(response.data);
-      setSelectedTab(type);
+      setSelectedTab(type); // Ensure this is updated correctly
     } catch (error) {
-      console.error(`Error fetching ${type} recipes:`, error);
+      setRecipes(null);
+      setError(`Unable to fetch ${type} recipes.`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="d-flex">
+    <div className="flex">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} userData={userData} />
       <Content
         recipes={recipes}
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}
         fetchRecipes={fetchRecipes}
+        loading={loading}
+        error={error}
       />
     </div>
   );
@@ -68,27 +73,27 @@ const UserProfile = () => {
 const Sidebar = ({ isOpen, setIsOpen, userData }) => {
   if (!isOpen)
     return (
-      <button className="btn btn-primary m-2" onClick={() => setIsOpen(true)}>
+      <button
+        className="btn btn-primary m-2 p-2"
+        onClick={() => setIsOpen(true)}
+      >
         <FaBookmark />
       </button>
     );
 
   return (
-    <div
-      className="sidebar bg-light p-3"
-      style={{ width: "300px", height: "100vh" }}
-    >
-      <div className="d-flex justify-content-between mb-4">
-        <h2>Profile</h2>
-        <button className="btn btn-light" onClick={() => setIsOpen(false)}>
+    <div className="bg-gray-100 p-4 h-screen w-72">
+      <div className="flex justify-between mb-6">
+        <h2 className="text-xl font-bold">Profile</h2>
+        <button className="text-gray-500" onClick={() => setIsOpen(false)}>
           <FaTimes />
         </button>
       </div>
-      <div className="text-center mb-4">
+      <div className="text-center mb-6">
         <Avatar name={userData?.Name || "User"} round={true} size="100" />
-        <h3 className="mt-3">{userData?.Name || "User"}</h3>
+        <h3 className="mt-3 text-lg">{userData?.Name || "User"}</h3>
       </div>
-      <div className="mb-4">
+      <div className="space-y-2">
         <p>
           <strong>Email:</strong> {userData?.Email_id}
         </p>
@@ -97,8 +102,8 @@ const Sidebar = ({ isOpen, setIsOpen, userData }) => {
         </p>
         <p
           className={`${
-            userData?.Verified ? "text-success" : "text-danger"
-          } fw-bold`}
+            userData?.Verified ? "text-green-600" : "text-red-600"
+          } font-bold`}
         >
           {userData?.Verified ? "Verified User" : "Not Verified User"}
         </p>
@@ -106,46 +111,76 @@ const Sidebar = ({ isOpen, setIsOpen, userData }) => {
     </div>
   );
 };
-const Content = ({ recipes, selectedTab, setSelectedTab, fetchRecipes }) => (
-  <div className="flex-grow-1 p-4">
-    <div className="d-flex justify-content-between align-items-center mb-4">
-      <h2>{selectedTab === "liked" ? "Liked Recipes" : "Saved Recipes"}</h2>
-      <div className="d-flex align-items-center">
+
+const Content = ({
+  recipes,
+  selectedTab,
+  setSelectedTab,
+  fetchRecipes,
+  loading,
+  error,
+}) => (
+  <div className="flex-grow p-6">
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-bold">
+        {selectedTab === "liked" ? "Liked Recipes" : "Saved Recipes"}
+      </h2>
+      <div className="flex items-center">
         <FaHeart
-          className={`me-2 ${
-            selectedTab === "liked" ? "text-danger" : "text-muted"
+          className={`mr-2 ${
+            selectedTab === "liked" ? "text-red-500" : "text-gray-500"
           }`}
         />
-        <div className="form-check form-switch">
+        <label className="flex items-center cursor-pointer">
+          <span className="mr-2">Toggle</span>
           <input
-            className="form-check-input"
             type="checkbox"
-            id="flexSwitchCheckDefault"
+            className="hidden"
             checked={selectedTab === "saved"}
             onChange={() =>
               fetchRecipes(selectedTab === "liked" ? "saved" : "liked")
             }
-            style={{ width: "3rem", height: "1.5rem" }}
           />
-        </div>
+          <span
+            className={`block w-14 h-8 rounded-full ${
+              selectedTab === "saved" ? "bg-blue-600" : "bg-gray-300"
+            } relative`}
+          >
+            <span
+              className={`block w-6 h-6 bg-white rounded-full absolute transition-transform duration-300 ${
+                selectedTab === "saved" ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </span>
+        </label>
         <FaBookmark
-          className={`ms-2 ${
-            selectedTab === "saved" ? "text-primary" : "text-muted"
+          className={`ml-2 ${
+            selectedTab === "saved" ? "text-blue-500" : "text-gray-500"
           }`}
         />
       </div>
     </div>
-    {recipes.length === 0 ? (
+
+    {loading ? (
+      <div className="flex justify-center">
+        <div className="spinner-border" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
+    ) : error ? (
+      <p className="text-red-500">{error}</p>
+    ) : !recipes ? (
       <p>No {selectedTab} recipes found.</p>
     ) : (
-      <ul className="list-group">
-        {recipes.map((recipe, index) => (
-          <li key={index} className="list-group-item">
-            {recipe.name}
-          </li>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {recipes?.map((recipe, index) => (
+          <div key={index} className="bg-white p-4 shadow-md rounded-lg">
+            <h3 className="text-lg font-semibold">{recipe.name}</h3>
+          </div>
         ))}
-      </ul>
+      </div>
     )}
   </div>
 );
+
 export default UserProfile;

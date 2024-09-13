@@ -5,7 +5,7 @@ const Verification = require("../models/database").verification;
 const bcryptjs = require("bcryptjs");
 const jsonwebtoken = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 const secretId = process.env.SECERTKEY || "RecipeDekh";
 const expiresIn = 1;
 
@@ -14,9 +14,9 @@ const transportar = nodemailer.createTransport({
   secure: false,
   auth: {
     user: process.env.AUTH_EMAIL,
-    pass: process.env.AUTH_PASS
-  }
-})
+    pass: process.env.AUTH_PASS,
+  },
+});
 function getToken(id) {
   return jsonwebtoken.sign({ id }, secretId, { expiresIn: expiresIn + "h" });
 }
@@ -36,7 +36,6 @@ function getToken(id) {
 // EmailSend()
 
 async function sendVerificationEmail({ _id, Email_id, Name }) {
-
   // Email content
   const emailContent = `
 <!DOCTYPE html>
@@ -66,31 +65,33 @@ async function sendVerificationEmail({ _id, Email_id, Name }) {
     from: process.env.AUTH_EMAIL,
     to: Email_id, // receiver
     subject: "Recipe Jhalak - Verification Link", // Subject line
-    html: emailContent.replace('{{Name}}', Name).replace('{{verificationToken}}', uniqueString).replace('{{id}}', _id)
-  }
+    html: emailContent
+      .replace("{{Name}}", Name)
+      .replace("{{verificationToken}}", uniqueString)
+      .replace("{{id}}", _id),
+  };
 
   const hashUniqueString = await bcryptjs.hash(uniqueString, 10);
   const newVerificationData = new Verification({
     userId: _id,
     verificationString: hashUniqueString,
     createdAt: Date.now(),
-    expiresAt: Date.now() + 1000 * 60 * 5
-  })
+    expiresAt: Date.now() + 1000 * 60 * 5,
+  });
   const result = await newVerificationData.save();
   if (!result) {
-    console.log("Verifcation Link cannot be not send")
+    console.log("Verifcation Link cannot be not send");
     return false;
   }
   transportar.sendMail(mailOptions, (err, info) => {
     if (err) {
       console.log("Verification link is not send");
       return false;
-    }
-    else {
-      console.log("Verification Link is send: ", info)
+    } else {
+      console.log("Verification Link is send: ", info);
       return true;
     }
-  })
+  });
 }
 
 const registerUser = async (request, response) => {
@@ -128,35 +129,43 @@ const registerUser = async (request, response) => {
 
     const result = await newUser.save();
     if (!result) {
-      return response.status(400).send({ error: true, message: "User cannot be Registered" });
+      return response
+        .status(400)
+        .send({ error: true, message: "User cannot be Registered" });
     }
-    console.log(result)
+    // console.log(result);
     const isVerificationLinkSent = await sendVerificationEmail(result);
-    console.log(isVerificationLinkSent)
+    // console.log(isVerificationLinkSent);
     const tokenId = getToken(result._id);
-    console.log(tokenId)
+    // console.log(tokenId);
     response.header("Auth", tokenId);
 
-    const successMessage = isVerificationLinkSent ? "Registration Completed, Verification Link Sent on Email" : "Registration Completed";
+    const successMessage = isVerificationLinkSent
+      ? "Registration Completed, Verification Link Sent on Email"
+      : "Registration Completed";
     return response.status(201).send({
       error: false,
       message: successMessage,
       token: authToken,
     });
-  }
-  catch (error) {
+  } catch (error) {
     return response
       .status(500)
-      .json({ error: true, message: `Internal Server Error as ${error.message}` });
+      .json({
+        error: true,
+        message: `Internal Server Error as ${error.message}`,
+      });
   }
-}
+};
 
 const postLogin = async (request, response) => {
   try {
     const { email, password } = request.body;
 
     if (!email || !password) {
-      return response.status(422).send({ error: true, message: "Please Entered Correct Details" });
+      return response
+        .status(422)
+        .send({ error: true, message: "Please Entered Correct Details" });
     }
     const checkUserAlready = await UserCollection.findOne({
       Email_id: email.toLowerCase(),
@@ -180,8 +189,13 @@ const postLogin = async (request, response) => {
     }
 
     const tokenId = getToken(checkUserAlready._id);
-    response.cookie('Token', tokenId, { path: "/", expiresIn: new Date(Date.now() + 1000 * 60 * 60 * 24), sameSite: "lax", httpOnly: true });
-    response.header("Authorization", `Bearer ${tokenId}`);
+    response.cookie("Token", tokenId, {
+      path: "/",
+      expiresIn: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      sameSite: "lax",
+      httpOnly: true,
+    });
+    // response.header("Authorization", `Bearer ${tokenId}`);
     response.header("Access-Control-Allow-Credentials", true);
     response.status(200).send({
       error: false,
@@ -193,11 +207,10 @@ const postLogin = async (request, response) => {
       .status(500)
       .json({ error: true, message: `Internal Server Error ${error.message}` });
   }
-}
+};
 
 const userProfile = async (request, response) => {
   const userId = request.user;
-
   try {
     const user_data = await UserCollection.findOne(
       {
@@ -207,21 +220,47 @@ const userProfile = async (request, response) => {
     );
 
     if (user_data) {
-      console.log(user_data)
+      // console.log(user_data);
       return response.status(200).send({ error: false, message: user_data });
     }
-    return response.status(404).send({ error: true, message: "User not found" });
+    return response
+      .status(404)
+      .send({ error: true, message: "User not found" });
   } catch (error) {
     return response
       .status(500)
       .json({ error: true, message: `Internal Server Error ${error.message}` });
   }
+};
+
+const authCheck = (req, res) => {
+  const token = req.cookies["Token"];
+  console.log(token);
+  if (!token) return res.status(401).send({ message: false,error:"No Token Present" });
+  try {
+    const decoded = jsonwebtoken.verify(token, secretId);
+    return res.status(200).send({ message: true, user: decoded });
+  } catch (error) {
+    return res.status(401).send({ message: false, error: "Invalid token" });
+  }
+};
+const logout=(req, res) => {
+    // Clear the authentication token cookie
+    res.clearCookie('Token', {
+      httpOnly: true,   // Set to true if using HTTPS
+      sameSite: 'lax', // Helps protect against CSRF attacks
+    });
+    // Send response to confirm logout
+    res.status(200).send({ message: "Logout successful" });
 }
+
 module.exports = {
   registerUser,
   postLogin,
-  userProfile
-}
+  userProfile,
+  logout,
+  authCheck
+};
 // module.exports = {
 
 //     Post_Register: async (request, response) => {

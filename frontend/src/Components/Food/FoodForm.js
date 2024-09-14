@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import Loading from "../common/Loading";
 
 const FoodForm = () => {
   const [formData, setFormData] = useState({
@@ -12,8 +13,8 @@ const FoodForm = () => {
     foodArea: "Afghanistan",
     foodDesc: "",
     isDrink: "",
-    foodInstruction: "",
-    foodIngredients: "",
+    foodInstruction: [],
+    foodIngredients: [],
     preparationTime: 0,
     cookingTime: 0,
     difficulty: "Easy",
@@ -32,22 +33,25 @@ const FoodForm = () => {
     }));
   };
 
-  const InputFileHandle = (e) => {
-    e.preventDefault();
-    let fileList = e.target.files[0];
-    let fileName =fileList.name.replace(RegExp(".png"), "").replace(" ", "") + Date.now();
-    console.log(fileName);
+  const handleInstructionChange = (value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      foodInstruction: value.split('\n').filter(Boolean), // Convert instructions to array
+    }));
+  };
+
+  const handleIngreChange = (value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      foodIngredients: value.split('\n').filter(Boolean), // Convert ingredients to array
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log(formData);
       setLoading(true);
-      const response = await axios.post(
-        "http://localhost:3001/api/food/add",
-        formData
-      );
+      const response = await axios.post("http://localhost:3001/api/food/add", formData);
       console.log(response);
     } catch (error) {
       setError(error.response.data);
@@ -56,29 +60,11 @@ const FoodForm = () => {
       setLoading(false);
     }
   };
-  const handleInstructionChange = async (e) => {
-    // e.preventDefault();
-    setFormData((prevData) => ({
-      ...prevData,
-      foodInstruction: e,
-    }));
-    console.log(e);
-  };
 
-  const handleIngreChange = async (e) => {
-    // e.preventDefault();
-    setFormData((prevData) => ({
-      ...prevData,
-      foodIngredients: e,
-    }));
-    console.log(e);
-  };
   useEffect(() => {
     async function getCategory() {
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/category/all"
-        );
+        const response = await axios.get("http://localhost:3001/api/category/all");
         if (response.data) {
           setCategory(response.data);
         }
@@ -93,96 +79,101 @@ const FoodForm = () => {
   }, []);
 
   if (loading) {
-    return <>Loading...</>;
+    return <Loading></Loading>;
   }
 
   if (error) {
-    return <>{error}</>;
+    return <div className="text-red-500">{error}</div>;
   }
 
   return (
-    <React.Fragment className="bg-dark">
-      <h2 className=" fw-bold  text-center mt-4">Add Food Item in Database</h2>
-      <p className="m-5 mb-2 mt-3 text-center">
-        Fill out the form below to add a new food item to the database. Select
-        the category, specify if it's a drink, and choose the country it belongs
-        to. Upload images, set preparation and cooking times, and describe the
-        food. Use the text editor for detailed cooking instructions and
-        ingredients. Click "Submit" to add your delicious creation to the
-        database.
+    <div className="bg-gray-100 p-8">
+      <h2 className="text-2xl font-bold text-center mb-4">Add Food Item in Database</h2>
+      <p className="text-center mb-6 text-gray-600">
+        Fill out the form below to add a new food item to the database. Select the category, specify if it's a drink, and choose the country it belongs to. Upload images, set preparation and cooking times, and describe the food. Use the text editor for detailed cooking instructions and ingredients. Click "Submit" to add your delicious creation to the database.
       </p>
 
-      {error ? (
-        <div className="alert-danger">Error Occurred {error}</div>
-      ) : (
-        <div></div>
+      {error && (
+        <div className="bg-red-100 text-red-500 p-3 rounded mb-4">
+          Error Occurred: {error}
+        </div>
       )}
-      <form onSubmit={handleSubmit} className="container">
-      <label for="foodName" class="form-label">
-        Enter Name of Recipe
-        </label>
-        <input
-          type="text"
-          name="foodName"
-          id="foodName"
-          class="form-control"
-          onChange={handleChange}
-          value={formData.foodName}
-          placeholder="Enter Name of Food"
-        />
-        <label htmlFor="food_category_id" className="form-label my-3">
-          Food Category
-        </label>
-        <div className="row">
-          {category.map((element) => (
-            <p key={element._id} className="col-sm-3 col-6">
-              <input
-                type="radio"
-                name="foodCategoryId"
-                id={`food_category_${element._id}`}
-                value={element._id}
-                className="form-check-input mx-2"
-                onChange={handleChange}
-              />
-              {element.Category_Name}
-            </p>
-          ))}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="foodName" className="block text-lg font-medium mb-2">
+            Enter Name of Recipe
+          </label>
+          <input
+            type="text"
+            name="foodName"
+            id="foodName"
+            className="w-full p-2 border border-gray-300 rounded"
+            onChange={handleChange}
+            value={formData.foodName}
+            placeholder="Enter Name of Food"
+          />
         </div>
 
-        <label htmlFor="Drink" className="form-label my-3">
-          Drink
-        </label>
-        <p>
-          <input
-            type="radio"
-            name="isDrink"
-            id="drink_yes"
-            value="Yes"
-            className="form-check-input mx-2"
-            onChange={handleChange}
-          />
-          Yes
-        </p>
-        <p>
-          <input
-            type="radio"
-            name="isDrink"
-            id="drink_no"
-            value="No"
-            className="form-check-input mx-2"
-            onChange={handleChange}
-          />
-          No
-        </p>
+        <div>
+          <label htmlFor="food_category_id" className="block text-lg font-medium mb-2">
+            Food Category
+          </label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {category.map((element) => (
+              <label key={element._id} className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="foodCategoryId"
+                  id={`food_category_${element._id}`}
+                  value={element._id}
+                  className="form-radio text-yellow-500"
+                  onChange={handleChange}
+                />
+                <span>{element.Category_Name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
 
-        <div className="form-group col-md-6 offset-md-0">
-          <label htmlFor="foodArea" className="form-label my-3">
+        <div>
+          <label htmlFor="Drink" className="block text-lg font-medium mb-2">
+            Is it a Drink?
+          </label>
+          <div className="flex space-x-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="isDrink"
+                id="drink_yes"
+                value="Yes"
+                className="form-radio text-yellow-500"
+                onChange={handleChange}
+              />
+              <span>Yes</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="isDrink"
+                id="drink_no"
+                value="No"
+                className="form-radio text-yellow-500"
+                onChange={handleChange}
+              />
+              <span>No</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="foodArea" className="block text-lg font-medium mb-2">
             Country Food Belongs
           </label>
           <select
             name="foodArea"
             id="foodArea"
-            className="form-select"
+            className="w-full p-2 border border-gray-300 rounded"
             value={formData.foodArea}
             onChange={handleChange}
           >
@@ -193,71 +184,59 @@ const FoodForm = () => {
           </select>
         </div>
 
-        <div className="row">
-          <div className="form-group col-md-6">
-            <label htmlFor="foodImg" className="form-label my-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="foodImg" className="block text-lg font-medium mb-2">
               Thumbnail Image
             </label>
             <input
               type="url"
               name="foodImg"
               id="foodImg"
+              className="w-full p-2 border border-gray-300 rounded"
               value={formData.foodImg}
-              className="form-control"
               onChange={handleChange}
             />
           </div>
-          <div className="form-group col-md-6">
-            <label htmlFor="previewImg" className="form-label my-3">
+          <div>
+            <label htmlFor="previewImg" className="block text-lg font-medium mb-2">
               Preview Images
             </label>
             <input
               type="url"
               name="previewImg"
               id="previewImg"
-              className="form-control"
+              className="w-full p-2 border border-gray-300 rounded"
               value={formData.previewImg}
               onChange={handleChange}
             />
           </div>
         </div>
-        {/* <div class=" form-group col-md-6">
-              <label for="preview_image" class="form-label my-3">
-                Preview Images-2
-              </label>
-              <input
-                type="url"
-                name="preview_image2"
-                id="preview_image2"
-                class="form-control"
-                onChange={handleChange}
-              />
-            </div> */}
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label for="ptime" class="form-label my-3">
-              Total Preparation Time
-              <sup class="text-danger fw-bold"> * in minutes</sup>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="preparationTime" className="block text-lg font-medium mb-2">
+              Total Preparation Time (minutes)
             </label>
             <input
               type="number"
               name="preparationTime"
               id="preparationTime"
-              class="form-control"
+              className="w-full p-2 border border-gray-300 rounded"
               placeholder="Enter Preparation Time..."
               value={formData.preparationTime}
               onChange={handleChange}
             />
           </div>
 
-          <div class="form-group col-md-6">
-            <label for="Difficuilt" class="form-label my-3">
-              Difficuilt Level
+          <div>
+            <label htmlFor="difficulty" className="block text-lg font-medium mb-2">
+              Difficulty Level
             </label>
             <select
               name="difficulty"
               id="difficulty"
-              class="form-select"
+              className="w-full p-2 border border-gray-300 rounded"
               onChange={handleChange}
               value={formData.difficulty}
             >
@@ -268,110 +247,81 @@ const FoodForm = () => {
           </div>
         </div>
 
-        <label for="ctime" class="form-label my-3">
-          Total Cooking Time
-          <sup class="text-danger fw-bold"> * in minutes</sup>
-        </label>
-        <input
-          type="number"
-          name="cookingTime"
-          id="cookingTime"
-          class="form-control"
-          onChange={handleChange}
-          value={formData.cookingTime}
-          placeholder="Enter Preparation Time..."
-        />
+        <div>
+          <label htmlFor="cookingTime" className="block text-lg font-medium mb-2">
+            Total Cooking Time (minutes)
+          </label>
+          <input
+            type="number"
+            name="cookingTime"
+            id="cookingTime"
+            className="w-full p-2 border border-gray-300 rounded"
+            placeholder="Enter Cooking Time..."
+            value={formData.cookingTime}
+            onChange={handleChange}
+          />
+        </div>
 
-        <label for="food_desc" class="form-label my-3">
-          Description about Food
-        </label>
-        <textarea
-          name="foodDesc"
-          id="foodDesc"
-          cols="30"
-          value={formData.foodDesc}
-          onChange={handleChange}
-          rows="3"
-          class="form-control"
-        ></textarea>
+        <div>
+          <label htmlFor="foodDesc" className="block text-lg font-medium mb-2">
+            Description about Food
+          </label>
+          <textarea
+            name="foodDesc"
+            id="foodDesc"
+            className="w-full p-2 border border-gray-300 rounded"
+            rows="4"
+            placeholder="Enter Description..."
+            value={formData.foodDesc}
+            onChange={handleChange}
+          />
+        </div>
 
-        <label for="Food_Ingrediants" class="form-label my-3">
-          Recipe to Cook Food
-        </label>
-        <ReactQuill
-          type="text"
-          style={{ height: "200px" }}
-          name="foodInstruction"
-          theme="snow"
-          id="foodInstruction"
-          className="mb-3"
-          placeholder="Procedure for Preparation of Recipe"
-          value={formData.foodInstruction}
-          onChange={handleInstructionChange}
-        ></ReactQuill>
+        <div>
+          <label htmlFor="foodInstruction" className="block text-lg font-medium mb-2">
+            Food Instructions
+          </label>
+          <ReactQuill
+            theme="snow"
+            value={formData.foodInstruction.join('\n')}
+            onChange={handleInstructionChange}
+          />
+        </div>
 
-        <label for="Food_Ingrediants" class="form-label mt-5">
-          Ingrediants Required to Cook Food
-        </label>
-        <ReactQuill
-          type="text"
-          style={{ height: "200px" }}
-          name="foodIngredients"
-          theme="snow"
-          id="foodIngredients"
-          placeholder="Procedure for Preparation of Recipe"
-          className="mb-3"
-          value={formData.foodIngredients}
-          onChange={handleIngreChange}
-        ></ReactQuill>
-        {/*   
-        <label for="food_Instruction" class="form-label my-3">
-          Procedure to Cook Food
-          <sup class="text-danger fw-bold">
-            After writing each step press ENTER
-          </sup>
-        </label>
-        <textarea
-          name="foodInstruction"
-          id="foodInstruction"
-          cols="30"
-          rows="8"
-          class="form-control"
-          value={formData.foodInstruction}
-          onChange={handleChange}
-        ></textarea> */}
-        {/* 
-        <label for="Food_Ingrediants" class="form-label my-3">
-          Ingrediants to Cook Food
-          <sup class="text-danger fw-bold">
-            After writing each Ingrediants press ENTER
-          </sup>
-        </label>
-        <textarea
-          name="foodIngredients"
-          id="foodIngredients"
-          cols="30"
-          rows="8"
-          class="form-control"
-          value={formData.foodIngredients}
-          onChange={handleChange}
-        ></textarea> */}
+        <div>
+          <label htmlFor="foodIngredients" className="block text-lg font-medium mb-2">
+            Food Ingredients
+          </label>
+          <ReactQuill
+            theme="snow"
+            value={formData.foodIngredients.join('\n')}
+            onChange={handleIngreChange}
+          />
+        </div>
 
-        {/* <input
-          type="file"
-          name="image"
-          id="image"
-          accept="image/png"
-          placeholder="Enter Preview Image"
-          title="Enter Preview Image"
-          className="mt-5"
-          onChange={InputFileHandle}
-        /> */}
-        <button type="submit" className="btn btn-warning my-3">
+        <div>
+          <label htmlFor="keyPoints" className="block text-lg font-medium mb-2">
+            Key Points
+          </label>
+          <textarea
+            name="keyPoints"
+            id="keyPoints"
+            className="w-full p-2 border border-gray-300 rounded"
+            rows="4"
+            placeholder="Enter Key Points..."
+            value={formData.keyPoints}
+            onChange={handleChange}
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+        >
           Submit
         </button>
       </form>
-    </React.Fragment>
+    </div>
   );
 };
 

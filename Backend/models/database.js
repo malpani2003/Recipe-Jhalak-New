@@ -39,6 +39,10 @@ const categorySchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    visitorCount:{
+      type:Number,
+      default:0
+    }
   },
   {
     timestamps: true,
@@ -97,25 +101,46 @@ const foodSchema = new mongoose.Schema(
         },
       },
     ],
-    likesUsers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
-      },
-    ],
-    nutritionalInfo: {
-      calories: Number,
-      protein: Number,
-      carbs: Number,
-      fat: Number,
+    likeCount:{
+      type:Number,
+      default:0
     },
     tags: [String],
     servings: Number,
+    visitorCount: {
+      type: Number,
+      default: 0
+    }
+  },
+  
+  {
+    timestamps: true,
+  }
+);
+
+const likeSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
+    foodId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "items",
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+
 
 const userSchema = new mongoose.Schema(
   {
@@ -200,10 +225,12 @@ const categories = mongoose.model("categories", categorySchema);
 const items = mongoose.model("items", foodSchema);
 const users = mongoose.model("users", userSchema);
 const verification = mongoose.model("verification", userVerificationSchema);
+const Like = mongoose.model("Like", likeSchema);
 
 module.exports = {
   categories: categories,
   items: items,
   users: users,
+  like:Like,
   verification: verification,
 };

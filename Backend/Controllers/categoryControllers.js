@@ -22,7 +22,7 @@ const addCategory = async (request, response) => {
       .status(500)
       .json({ error: `Failed to add category: ${error.message}` });
   }
-}
+};
 
 const getAllCategory = async (request, response) => {
   try {
@@ -30,9 +30,15 @@ const getAllCategory = async (request, response) => {
     // console.log(request)
     if (request.query && request.query["item"]) {
       const itemNameRegex = new RegExp(request.query["item"], "i");
-      allCategories = await Category_Collection.find({ name: itemNameRegex });
+      allCategories = await Category_Collection.find(
+        { name: itemNameRegex },
+        { Category_Name: 1, Category_Img: 1, TotalRecipe: 1 }
+      );
     } else {
-      allCategories = await Category_Collection.find();
+      allCategories = await Category_Collection.find(
+        {},
+        { Category_Name: 1, Category_Img: 1, TotalRecipe: 1 }
+      );
     }
 
     // console.log(allCategories);
@@ -42,11 +48,15 @@ const getAllCategory = async (request, response) => {
       .status(500)
       .json({ error: `Internal Server Error ${error.message}` });
   }
-}
+};
 const getFoodForCategory = async (request, response) => {
   try {
     const categoryId = request.params.category_id.trim();
     const pageNum = request.query.pageNum.trim();
+    // GET /api/category/food/66c89de4a7bd26d66142db62?pageNum=1&difficulty=Easy&time=15&country=USA
+    const difficulty = request.query.difficulty.trim();
+    const country = request.query.country.trim();
+    const time = request.query.time;
     // console.log(pageNum)
     const categoryData = await Category_Collection.findById(categoryId);
 
@@ -56,14 +66,25 @@ const getFoodForCategory = async (request, response) => {
 
     const skip = (pageNum - 1) * 6;
     const categoryName = categoryData.Category_Name;
+    const filterQuery = { foodCategoryId: categoryId };
+    if (difficulty) {
+      filterQuery.difficulty = difficulty;
+    }
 
-    const totalLength = await Item_Collection.countDocuments({ foodCategoryId: categoryId });
+    if (country) {
+      filterQuery.foodArea = country;
+    }
 
-    const categoryFoodItems = await Item_Collection.find({
-      foodCategoryId: categoryId,
-    }, { foodName: 1, previewImg: 1, foodImg: 1 }).limit(6).skip(skip);
+    const totalLength = await Item_Collection.countDocuments(filterQuery);
+    const categoryFoodItems = await Item_Collection.find(filterQuery, {
+      foodName: 1,
+      foodImg: 1,
+    })
+      .limit(6)
+      .skip(skip);
+
     const jsonData = {
-      categoryName: categoryName, 
+      categoryName: categoryName,
       totalFoodItem: totalLength,
       foodList: categoryFoodItems,
     };
@@ -74,11 +95,49 @@ const getFoodForCategory = async (request, response) => {
       .status(500)
       .json({ error: `Internal Server Error ${error.message}` });
   }
-}
+};
+const incrementVisitCount = async (req, res) => {
+  const { categoryID } = req.params;
+
+  try {
+    // Increment the visit count by 1
+    console.log("Hi", categoryID);
+    const category = await Category_Collection.findByIdAndUpdate(
+      categoryID,
+      { $inc: { visitorCount: 1 } }, // increment visitCount field
+      { new: true }
+    );
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    res.json({ message: "Visit count incremented", category });
+  } catch (error) {
+    res.status(500).json({ message: "Error incrementing visit count", error });
+  }
+};
+
+const popularCategory = async (req, res) => {
+  try {
+    const categories = await Category_Collection.find(
+      {},
+      { Category_Img: 1, Category_Name: 1 }
+    )
+      .sort({ visitorCount: -1 })
+      .limit(6);
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error("Error fetching popular categories:", error);
+    res.status(500).json({ message: "Error fetching popular categories" });
+  }
+};
+
 module.exports = {
   addCategory,
   getFoodForCategory,
   getAllCategory,
+  incrementVisitCount,
+  popularCategory,
   updateCategory: async (request, response) => {
     try {
       const categoryId = request.params.category_id.trim();

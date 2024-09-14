@@ -17,6 +17,7 @@ import SearchFood from "./Components/Food/SearchFood";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NewProfile from "./Components/Profile/NewUserProfile";
+import ContactUs from "./Components/Contact/ContactUs";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/filter" element={<Filter />} />
           <Route path="/profile" element={<UserProfile></UserProfile>} />
+          <Route path="/contact" element={<ContactUs></ContactUs>} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
         <Footer />

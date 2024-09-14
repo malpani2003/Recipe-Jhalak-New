@@ -1,10 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { FaChevronDown } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setisLogin] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,7 +18,7 @@ function Navbar() {
             withCredentials: true,
           }
         );
-        if (response.status == 200) {
+        if (response.status === 200) {
           setisLogin(true);
         } else {
           setisLogin(false);
@@ -34,13 +36,18 @@ function Navbar() {
       const response = await axios.post(
         "http://localhost:3001/api/users/logout"
       );
-      if (response.status == 200) {
+      if (response.status === 200) {
         setisLogin(false);
         navigate("/login");
       }
     } catch (err) {
       console.error("Error during logout:", err);
     }
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    navigate(`/search?query=${searchQuery}`);
   };
 
   return (
@@ -54,20 +61,29 @@ function Navbar() {
             </Link>
           </div>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex space-x-4">
+          {/* Desktop Navigation Links and Search */}
+          <div className="hidden md:flex items-center space-x-4">
+            <form onSubmit={handleSearchSubmit} className="flex flex-grow">
+              <input
+                type="search"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="p-2 rounded-full border border-gray-300 flex-grow focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              />
+              {/* <button
+                type="submit"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-r-md"
+              >
+                Search
+              </button> */}
+            </form>
             <Link
               to="/category"
               className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
             >
               Categories
             </Link>
-            {/* <Link
-              to="/contact"
-              className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Filter By
-            </Link> */}
             {/* Profile and Logout Links */}
             {isLoggedIn ? (
               <>
@@ -122,18 +138,21 @@ function Navbar() {
       {/* Mobile Menu */}
       <div className={`md:hidden ${isMenuOpen ? "block" : "hidden"}`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col mb-4">
+            <input
+              type="search"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="p-2 rounded-md border border-gray-300 mb-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+          </form>
           <Link
             to="/category"
             className="text-white hover:text-gray-300 block px-3 py-2 rounded-md text-base font-medium"
           >
             Categories
           </Link>
-          {/* <Link
-            to="/contact"
-            className="text-white hover:text-gray-300 block px-3 py-2 rounded-md text-base font-medium"
-          >
-            Filter By
-          </Link> */}
           {/* Profile and Logout Links */}
           {isLoggedIn ? (
             <>

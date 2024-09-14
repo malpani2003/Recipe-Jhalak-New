@@ -2,43 +2,56 @@ const UserCollection = require("../models/database").users;
 const jsonwebtoken = require("jsonwebtoken");
 require("dotenv").config();
 
-
 const secretId = process.env.SECERTKEY || "RecipeDekh";
 
-const isAdmin = async (request, response, next) => {
-  const token = request.cookies["Token"];
-  console.log(token);
-  if (!token) return response.status(401).send("Please Login first");
+const isAdmin = async (req, res, next) => {
+  const token = req.cookies["Token"];
+  
+  if (!token) {
+    return res.status(401).json({ message: "Please login first." });
+  }
+
   try {
     const decoded = jsonwebtoken.verify(token, secretId);
-    console.log(decoded);
     const userId = decoded.id;
+    
     const userData = await UserCollection.findById(userId);
-    console.log(userData);
-    const isAdmin = userData["isAdmin"] || false;
-    if (isAdmin) {
-      next();
-    } else {
-      response
-        .status(403)
-        .json({ error: "Forbidden. Only admins can perform this action." });
+    if (!userData) {
+      return res.status(404).json({ message: "User not found." });
     }
-  } catch (error) {
-    return response.status(401).send("Invalid Token");
-  }
-};
-const verifyToken = async (request, response) => {
-  const token = request.cookies["Token"];
-  if (!token) return response.status(401).send("Access Denied");
 
-  try { 
-    const decoded = jsonwebtoken.verify(token, secretId);
-    request.user = decoded.id;
-    return;
-  } catch (error) { 
-    return response.status(401).send("Invalid Token");
+    if (userData.isAdmin) {
+      return next();
+    } else {
+      return res.status(403).json({ error: "Access forbidden. Admins only." });
+    }
+
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    return res.status(401).json({ message: "Invalid or expired token." });
   }
 };
+
+const verifyToken = async (req, res, next) => {
+  const token = req.cookies["Token"];
+
+  if (!token) {
+    return res.status(401).json({ message: "Please Login" });
+  }
+
+  try {
+    console.log("Token ",token);
+    console.log(secretId);
+    const decoded = jsonwebtoken.verify(token,secretId);
+    console.log(decoded);
+    req.user = decoded.id;
+    next();
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(401).json({ message: "Invalid or expired token." });
+  }
+};
+
 module.exports = {
   isAdmin,
   verifyToken,

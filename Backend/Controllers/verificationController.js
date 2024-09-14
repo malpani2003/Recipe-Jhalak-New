@@ -6,7 +6,7 @@ const path = require('path');
  
 const verifyLink = async (request, response) => {
     console.log(request.params);
-    const { userId, verifyString } = request.params;
+    const { userId, verifyString } = request.params; 
     const dirName=__dirname.split("/");
     dirName.pop();
     const mainPath=dirName.join("/");

@@ -1,209 +1,242 @@
-const express = require("express");
 const Category_Collection = require("../models/database").categories;
 const UserCollection = require("../models/database").users;
 const Item_Collection = require("../models/database").items;
-const { request } = require("express");
+const Like_collection = require("../models/database").like;
 
 module.exports = {
-  addFood: async (request, response) => {
+  addFood: async (req, res) => {
     try {
-      const food = request.body;
-      // console.log(food);
-
-      const Instruction = food["food_Instruction"].trim();
-      const Ingredient = food["Food_Ingrediants"].trim();
+      const { food_Instruction, Food_Ingrediants, ...rest } = req.body;
 
       const newRecipe = new Item_Collection({
-        Food_Name: food["food_nm"].trim(),
-        Food_Img: food["link"].trim(),
-        Preview_Img: food["preview_image"].trim(),
-        Food_Category_ID: food["food_category_id"].trim(),
-        ptime: food["ptime"].trim(),
-        ctime: food["ctime"].trim(),
-        Food_Area: food["foodArea"].trim(),
-        IsDrink: food["Drink"].trim(),
-        Food_Instruction: Instruction.split("\n"),
-        Food_Ingrediants: Ingredient.split("\n"),
-        Difficult: food["Difficuilt"].trim(),
-        Food_Desc: food["food_desc"].trim().split("\n"),
+        ...rest,
+        Food_Instruction: food_Instruction.trim().split("\n"),
+        Food_Ingrediants: Food_Ingrediants.trim().split("\n"),
       });
 
       const result = await newRecipe.save();
-      if (result) {
-        response.status(200).json(result);
-      } else {
-        response.status(500).json({ Error: "Cannot be added" });
-      }
+      res.status(200).json(result);
     } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
   },
-  addFood2: async (request, response) => {
+
+  addFood2: async (req, res) => {
     try {
-      const food = request.body;
-      // console.log(food);
-      food["isDrink"] = food["isDrink"] == "Yes" ? true : false;
+      const food = req.body;
+      food["isDrink"] = food["isDrink"] === "Yes";
       const newRecipe = new Item_Collection(food);
       const result = await newRecipe.save();
-      if (result) {
-        response.status(200).json(result);
-      } else {
-        response.status(500).json({ Error: "Cannot be added" });
-      }
+      res.status(200).json(result);
     } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
   },
 
-
-  getFoodDetails: async (request, response) => {
+  getFoodDetails: async (req, res) => {
     try {
-      const foodId = request.params.food_id.trim();
-      const foodData = await Item_Collection.findById(foodId);
-      // console.log(foodData);
+      const { food_id } = req.params;
+      const foodData = await Item_Collection.findById(food_id);
+      if (!foodData)
+        return res.status(404).json({ error: "Food item not found" });
+
       const foodSameCategoryData = await Item_Collection.find({
-        foodCategoryId: foodData["foodCategoryId"],
+        foodCategoryId: foodData.foodCategoryId,
       });
 
       const categoryData = await Category_Collection.findById(
-        foodData["foodCategoryId"]
+        foodData.foodCategoryId
       );
-      // console.log(categoryData);
-      const categoryName = categoryData["Category_Name"];
+      const categoryName = categoryData?.Category_Name || "Unknown";
 
-      const len = foodSameCategoryData.length;
       const similarArray = [];
-      const total = len < 4 ? len : 4;
-      for (let index = 0; index < total; index++) {
-        const randomNum = Math.floor(Math.random() * len);
-        const item = foodSameCategoryData[randomNum];
-        if (similarArray.includes(item)) {
-          index = index - 1;
-        } else {
-          const jsonData = {
-            "_id": item["_id"],
-            "foodImg": item["foodImg"],
-            "foodName": item["foodName"]
-          }
-          similarArray.push(jsonData);
+      const total = Math.min(foodSameCategoryData.length, 4);
+      while (similarArray.length < total) {
+        const randomItem =
+          foodSameCategoryData[
+            Math.floor(Math.random() * foodSameCategoryData.length)
+          ];
+        if (!similarArray.find((item) => item._id.equals(randomItem._id))) {
+          similarArray.push({
+            _id: randomItem._id,
+            foodImg: randomItem.foodImg,
+            foodName: randomItem.foodName,
+          });
         }
       }
 
-      const jsonData = {
+      res.status(200).json({
         FoodDetails: foodData,
         similarFoodCategory: similarArray,
         category: categoryName,
-      };
-
-      // console.log(jsonData);
-      response.status(200).json(jsonData);
-    } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
-    }
-  },
-  getSearchFoodItem: async (request, response) => {
-    try {
-      const foodName = request.query.fname;
-      // console.log(foodName);
-      const searchFoodItem = await Item_Collection.find({
-        foodName: new RegExp(foodName, 'i'),
       });
-      // console.log(searchFoodItem);
-      response.status(200).send(searchFoodItem);
     } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
   },
 
-  deleteFood: async (request, response) => {
+  getSearchFoodItem: async (req, res) => {
     try {
-      const foodId = request.params.food_id.trim();
-      await Item_Collection.findByIdAndDelete(foodId);
-      response.status(200).send({ "msg": "Successfully Deleted" });
+      const { fname } = req.query;
+      const searchFoodItem = await Item_Collection.find({
+        foodName: new RegExp(fname, "i"),
+      });
+      res.status(200).json(searchFoodItem);
     } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
   },
-  updateFood: async (request, response) => {
+
+  deleteFood: async (req, res) => {
     try {
-      const foodId = request.params.food_id.trim();
-      const newFoodData = request.body;
-      await Item_Collection.findByIdAndUpdate(foodId, { $set: newFoodData });
-      response.status(200).send({ "msg": "Successfully Deleted" });
+      const { food_id } = req.params;
+      const result = await Item_Collection.findByIdAndDelete(food_id);
+      if (!result)
+        return res.status(404).json({ error: "Food item not found" });
+      res.status(200).json({ msg: "Successfully Deleted" });
     } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
   },
-  getAllFood: async (request, response) => {
+
+  updateFood: async (req, res) => {
     try {
-      const foodItemList = await Item_Collection.find();
-      // console.log(foodItemList);
-      response.status(200).send(foodItemList);
+      const { food_id } = req.params;
+      const newFoodData = req.body;
+      const result = await Item_Collection.findByIdAndUpdate(
+        food_id,
+        { $set: newFoodData },
+        { new: true }
+      );
+      if (!result)
+        return res.status(404).json({ error: "Food item not found" });
+      res.status(200).json({ msg: "Successfully Updated", data: result });
     } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
   },
-  addComment: async (request, response) => {
+
+  latestRecipe: async (req, res) => {
     try {
-      const commentJson = request.body;
-      // console.log(request.user);
-      // console.log(request.body);
-      const UserData = await UserCollection.findById(request.user, { Name: 1 });
-      // console.log(UserData);
-      const json = {
-        'userName': UserData["Name"],
-        'comment': request.body["comment"],
-        'date': request.body["date"]
+      const foodItemList = await Item_Collection.find({},{foodName:1,foodImg:1,likeCount:1,visitorCount:1})
+        .sort({ timestamp: -1 })
+        .limit(6);
+
+      res.status(200).json(foodItemList);
+    } catch (error) {
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
+    }
+  },
+
+  mostLikeRecipe: async (req, res) => {
+    try {
+      const foodItemList = await Item_Collection.find({},{foodName:1,foodImg:1,likeCount:1,visitorCount:1})
+        .sort({likeCount:-1}) 
+        .limit(9);
+
+      res.status(200).json(foodItemList);
+    } catch (error) {
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
+    }
+  },
+
+  addComment: async (req, res) => {
+    try {
+      const { foodId, comment, date } = req.body;
+      const userData = await UserCollection.findById(req.user, { Name: 1 });
+      const newComment = {
+        userName: userData?.Name || "Anonymous",
+        comment,
+        date,
       };
-      const UpdatedItem = await Item_Collection.findByIdAndUpdate(request.body["foodId"], { $push: { comments: json } });
-      response.status(200).send(UpdatedItem);
-    }
-    catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
-    }
-  },
-
-  likeRecipe: async (request, response) => {
-    // console.log("enter");
-    try {
-      const userData = request.user;
-      response.send(userData);
-      const UpdatedItem = await Item_Collection.findByIdAndUpdate(request.body["foodId"], { $push: { likesUsers: userData } });
-      response.status(200).send(UpdatedItem);
+      const updatedItem = await Item_Collection.findByIdAndUpdate(
+        foodId,
+        { $push: { comments: newComment } },
+        { new: true }
+      );
+      res.status(200).json(updatedItem);
     } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Internal Server Error ${error.message}` });
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
   },
 
-  getFilterFoodData: async (request, response) => {
-    // console.log(request.query);
-    if (request.query["name"] == "area") {
-      const result = await Item_Collection.distinct("foodArea");
-      response.status(200).json(result);
+  likeRecipe: async (req, res) => {
+    const userId = req.user;
+    const { foodId } = req.body;
+
+    try {
+      if (!foodId || !userId) {
+        return res
+          .status(400)
+          .json({ error: "Food ID and User ID are required" });
+      }
+
+      const existingLike = await Like_collection.findOne({ userId, foodId });
+      if (existingLike) {
+        return res
+          .status(400)
+          .json({ message: "You have already liked this recipe" });
+      }
+
+      const newLike = new Like_collection({ userId, foodId });
+      const result = await newLike.save();
+
+      if (!result) {
+        return res.status(500).json({ message: "Failed to like the recipe" });
+      }
+
+      const updatedRecipe = await Item_Collection.findByIdAndUpdate(
+        foodId,
+        { $inc: { likeCount: 1 } }, 
+        { new: true }
+      );
+
+      if (!updatedRecipe) {
+        return res
+          .status(500)
+          .json({ message: "Failed to update recipe like count" });
+      }
+
+      return res
+        .status(200)
+        .json({ message: "Recipe liked successfully", like: newLike });
+    } catch (error) { 
+      console.error("Error in liking the recipe:", error);
+      return res
+        .status(500)
+        .json({ error: `Internal Server Error: ${error.message}` });
     }
-    else if (request.query["name"] == "veg") {
-      // const result=await Item_Collection.find()
+  },
+
+  getFilterFoodData: async (req, res) => {
+    try {
+      const { name } = req.query;
+      if (name === "area") {
+        const result = await Item_Collection.distinct("foodArea");
+        res.status(200).json(result);
+      } else if (name === "veg") {
+        // Add your logic for vegetarian filtering
+      } else {
+        res.status(200).json({ result: "Yes" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
-    else {
-      response.status(200).json({ result: "Yes" });
+  },
+
+  visitRecipe: async (req, res) => {
+    try {
+      const { foodId } = req.params;
+      const updatedItem = await Item_Collection.findByIdAndUpdate(
+        foodId,
+        { $inc: { visitorCount: 1 } },
+        { new: true }
+      );
+      if (!updatedItem)
+        return res.status(404).json({ error: "Food item not found" });
+      res.status(200).json(updatedItem);
+    } catch (error) {
+      res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }
-  }
+  },
 };

@@ -5,10 +5,15 @@ import {
   FaShareAlt,
   FaPrint,
   FaClock,
+  FaMapMarkerAlt,
+  FaLeaf,FaChartLine,
   FaUtensils,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import Loading from "../common/Loading";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const RecipeHeader = ({ recipeData }) => {
   const [recipe, setRecipe] = useState({});
@@ -24,155 +29,187 @@ const RecipeHeader = ({ recipeData }) => {
   };
 
   const handleLikeIncrement = async (foodId) => {
-    const userID = localStorage.getItem("authToken");
-    const config = {
-      headers: {
-        Auth: userID,
-      },
-    };
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/food/like/",
+        `${process.env.REACT_APP_API_URL}/food/like/`,
         { foodId: foodId },
-        config
+        { withCredentials: true }
       );
       console.log(response);
+      toast.success("Recipe liked successfully!");
     } catch (error) {
-      console.error("Error liking the recipe:", error);
+      console.error("Error liking the recipe:", error.response.data.message);
+      toast.error(error.response.data.message);
     }
   };
 
+  const handleShare = () => {
+    navigator
+      .share({
+        title: "Check out this recipe!",
+        url: window.location.href,
+      })
+      .then(() => console.log("Shared successfully"))
+      .catch(console.error);
+  };
+
   if (!recipe.FoodDetails) {
-    return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: "100vh" }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
-    <div className="container-fluid p-0">
-      <div className="position-relative mt-3">
-        <img
-          src={recipe.FoodDetails.previewImg}
-          alt={recipe.FoodDetails.foodName}
+    <div className="container mx-auto p-0">
+      <div
+        className="relative rounded-lg overflow-hidden mt-3"
+        style={{ height: "60vh" }}
+      >
+        <div
+          className="absolute inset-0 bg-center bg-cover rounded-lg"
           style={{
-            width:"100%",
-            height: "80vh",
-            objectFit: "cover",
-            filter: "brightness(40%)",
+            backgroundImage: `url(${recipe.FoodDetails.previewImg})`,
+            filter: "blur(3px)",
           }}
-        />
-        <div className="position-absolute top-50 start-50 translate-middle text-center text-white">
-          <h1 className="display-3 fw-bold mb-3">
+        ></div>
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white">
+          <h1 className="text-4xl font-bold mb-3">
             {recipe.FoodDetails.foodName}
           </h1>
-          <p className="lead">
-            By: <em>Pranav Malpani</em>
-          </p>
         </div>
       </div>
 
-      <div className="container mt-4">
-        <nav aria-label="breadcrumb">
-          <ol className="breadcrumb">
-            <li className="breadcrumb-item">
-              <Link to="/category">Categories</Link>
+      <div className="container mx-auto mt-4">
+        <nav aria-label="breadcrumb" className="text-sm breadcrumbs">
+          <ul className="flex">
+            <li>
+              <Link to="/category" className="text-blue-500 hover:underline">
+                Categories
+              </Link>
             </li>
-            <li className="breadcrumb-item">
-              <Link to={`/category/${recipe.FoodDetails.foodCategoryId}`}>
+            <li>
+              <span>/</span>
+            </li>
+            <li>
+              <Link
+                to={`/category/${recipe.FoodDetails.foodCategoryId}`}
+                className="text-blue-500 hover:underline"
+              >
                 {recipe.category}
               </Link>
             </li>
-            <li className="breadcrumb-item active" aria-current="page">
-              {recipe.FoodDetails.foodName}
+            <li>
+              <span>/</span>
             </li>
-          </ol>
+            <li>
+              <span className="text-gray-600">
+                {recipe.FoodDetails.foodName}
+              </span>
+            </li>
+          </ul>
         </nav>
 
-        <div className="row g-4">
-          <div className="col-md-12">
-            <div className="card shadow-sm">
-              <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <div>
-                    {["Veg", "Salad", "Breakfast"].map((item, index) => (
-                      <span key={index} className="badge bg-success me-2">
-                        {item}
-                      </span>
+        <div className="mt-4">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex flex-wrap justify-between items-center mb-3">
+              <div className="mb-2 md:mb-0">
+                {["Veg", "Salad", "Breakfast"].map((item, index) => (
+                  <span
+                    key={index}
+                    className="bg-green-500 text-white text-xs px-3 py-2 rounded-full mr-2 mb-1"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center">
+                {/* {[...Array(5)].map((_, starIndex) => (
+                  <IoStarSharp key={starIndex} className="text-yellow-400" />
+                ))} */}
+                {/* <span className="ml-2 text-gray-500 hidden sm:inline">
+                  (Random rating)
+                </span> */}
+                <div>
+                  <div className="flex flex-wrap justify-around">
+                    {[
+                      {
+                        icon: FaThumbsUp,
+                        label: "Like",
+                        action: () =>
+                          handleLikeIncrement(recipe.FoodDetails._id),
+                      },
+                      {
+                        icon: FaShareAlt,
+                        label: "Share",
+                        action: handleShare,
+                      },
+                      {
+                        icon: FaPrint,
+                        label: "Print",
+                        action: handlePrint,
+                      },
+                    ].map((item, index) => (
+                      <button
+                        key={index}
+                        className="btn border mr-2 p-2 rounded transition duration-300 flex flex-row justify-center hover:bg-blue-800 hover:text-white"
+                        onClick={item.action}
+                      >
+                        <item.icon className="mb-1" />
+                        <span className="block text-sm mx-1 ">
+                          {item.label}
+                        </span>
+                      </button>
                     ))}
-                  </div>
-                  <div className="d-flex align-items-center">
-                    {[...Array(5)].map((_, starIndex) => (
-                      <IoStarSharp key={starIndex} className="text-warning" />
-                    ))}
-                    <span className="ms-2 text-muted">(Random rating)</span>
-                  </div>
-                </div>
-                <p className="lead">
-                  {recipe.FoodDetails.foodDesc || "No description available."}
-                </p>
-                <div className="d-flex flex-wrap justify-content-around text-center mt-4">
-                  <div>
-                    <FaClock className="text-warning mb-2" size={24} />
-                    <p className="mb-0">Prep Time</p>
-                    <p className="fw-bold">
-                      {recipe.FoodDetails.preparationTime} min
-                    </p>
-                  </div>
-                  <div>
-                    <FaUtensils className="text-warning mb-2" size={24} />
-                    <p className="mb-0">Cook Time</p>
-                    <p className="fw-bold">
-                      {recipe.FoodDetails.cookingTime} min
-                    </p>
-                  </div>
-                  <div>
-                    <FaUtensils className="text-warning mb-2" size={24} />
-                    <p className="mb-0">Servings</p>
-                    <p className="fw-bold">4 people</p>
-                  </div>
-
-                  <div>
-                    <FaUtensils className="text-warning mb-2" size={24} />
-                    <p className="mb-0">Difficulty Level</p>
-                    <p className="fw-bold"> {recipe.FoodDetails.difficulty}</p>
-                  </div>
-                  <div>
-                    <FaUtensils className="text-warning mb-2" size={24} />
-                    <p className="mb-0">Country</p>
-                    <p className="fw-bold"> {recipe.FoodDetails.foodArea}</p>
                   </div>
                 </div>
               </div>
+            </div>
+            <p className="text-lg mb-4">
+              {recipe.FoodDetails.foodDesc || "No description available."}
+            </p>
+            <div className="grid grid-cols-3 md:grid-cols-6 justify-around text-center mt-4">
+              {[
+                {
+                  icon: FaClock, // Time-related icon
+                  label: "Prep Time",
+                  value: `${recipe.FoodDetails.preparationTime} min`,
+                },
+                {
+                  icon: FaClock, // Time-related icon
+                  label: "Cook Time",
+                  value: `${recipe.FoodDetails.cookingTime} min`,
+                },
+                {
+                  icon: FaUtensils, // Serving or dining icon
+                  label: "Servings",
+                  value: "4 people",
+                },
+                {
+                  icon: FaChartLine, // Difficulty icon
+                  label: "Difficulty",
+                  value: recipe.FoodDetails.difficulty,
+                },
+                {
+                  icon: FaMapMarkerAlt, // Location icon
+                  label: "Country",
+                  value: recipe.FoodDetails.foodArea,
+                },
+                {
+                  icon: FaLeaf, // Vegetarian/Vegan-related icon
+                  label: "Veg / Non-Veg",
+                  value: "Veg",
+                },
+              ].map((item, index) => (
+                <div key={index} className="mb-3 mx-2">
+                  <item.icon
+                    className="text-yellow-400 mb-2 mx-auto"
+                    size={24}
+                  />
+                  <p className="mb-0 text-sm">{item.label}</p>
+                  <p className="font-bold">{item.value}</p>
+                </div>
+              ))}
             </div>
           </div>
-          {/* <div className="col-md-4">
-            <div className="card shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title mb-3">Recipe Actions</h5>
-                <div className="d-grid gap-2">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => handleLikeIncrement(recipe.FoodDetails._id)}
-                  >
-                    <FaThumbsUp className="me-2" /> Like Recipe
-                  </button>
-                  <button className="btn btn-success">
-                    <FaShareAlt className="me-2" /> Share Recipe
-                  </button>
-                  <button className="btn btn-secondary" onClick={handlePrint}>
-                    <FaPrint className="me-2" /> Print Recipe
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cookie_parser = require("cookie-parser");
 const logger=require("morgan");
+const compression=require("compression");
 
 // const importModules=require("./ModuleImport");
 const authroutes = require("./routes/authroutes");
@@ -18,13 +19,14 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookie_parser());
 app.use(express.json());
+app.use(compression());
 app.use(
   cors({
       origin: 'http://localhost:3000',
       optionsSuccessStatus: 200,
       credentials: true,
   })
-);
+); 
 app.use(logger("dev"));
 
 app.get("/api", (request, response) => {

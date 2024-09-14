@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import Loading from "../common/Loading";
+import ErrorPage from "../404Page/ErrorPage";
 
 function ShowCategory() {
   const [category, setCategory] = useState([]);
@@ -13,7 +15,8 @@ function ShowCategory() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/category/all');
+        // Use env variable for API URL
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/category/all`);
         console.log('Fetched data:', response.data); // Debug: Check the data structure
         setCategory(response.data);
         setFilterCategoryArr(response.data);
@@ -61,14 +64,12 @@ function ShowCategory() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="spinner-border animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-      </div>
+      <Loading></Loading>
     );
   }
 
   if (error) {
-    return <div className="text-center text-red-600">{error}</div>
+    return <ErrorPage></ErrorPage>
   }
 
   return (

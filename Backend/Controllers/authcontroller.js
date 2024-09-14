@@ -35,7 +35,7 @@ function getToken(id) {
 
 // EmailSend()
 
-async function sendVerificationEmail({ _id, Email_id, Name }) {
+async function sendVerificationEmail({ _id, Email_id, Name }) { 
   // Email content
   const emailContent = `
 <!DOCTYPE html>
@@ -212,7 +212,7 @@ const postLogin = async (request, response) => {
 const userProfile = async (request, response) => {
   const userId = request.user;
   try {
-    const user_data = await UserCollection.findOne(
+    const user_data = await UserCollection.findOne( 
       {
         _id: userId,
       },

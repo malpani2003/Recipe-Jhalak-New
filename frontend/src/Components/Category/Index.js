@@ -7,17 +7,17 @@ import { ArrowBigDown } from "lucide-react";
 
 function LatestRecipe() {
   const [recipe, setRecipe] = useState([]);
-
+  
   useEffect(() => {
     async function allFoodGetRequest() {
+      console.log(process.env.REACT_APP_API_URL);
       try {
-        const response = await axios.get("http://localhost:3001/api/food/all");
-        setRecipe(response.data.slice(0, 6));
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/food/latest`);
+        setRecipe(response.data); 
       } catch (err) {
         console.log("Error Occurred");
       }
     }
-
     allFoodGetRequest();
   }, []);
 
@@ -86,17 +86,33 @@ function TopRecipe() {
   useEffect(() => {
     async function allFoodGetRequest() {
       try {
-        const response = await axios.get("http://localhost:3001/api/food/all");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/food/mostLiked`);
         const recipeData = response.data;
         recipeData.sort((a, b) => b.likes - a.likes);
         setRecipe(recipeData.slice(0, 9));
       } catch (err) {
         console.log("Error Occurred");
-      }
+      } 
     }
 
     allFoodGetRequest();
   }, []);
+
+  // Function to calculate the rating based on likeCount and visitorCount
+  const calculateRating = (likeCount, visitorCount) => {
+    const maxLikes = 1000; // Define a maximum value for likes for scaling purposes
+    const maxVisitors = 5000; // Define a maximum value for visitors for scaling purposes
+
+    // Normalizing the likes and visitor counts (scaling them to 0 - 1 range)
+    const likeRatio = Math.min(likeCount / maxLikes, 1); 
+    const visitorRatio = Math.min(visitorCount / maxVisitors, 1);
+
+    // Calculating the weighted rating
+    const rating = (likeRatio * 0.7 + visitorRatio * 0.3) * 5;
+
+    // Returning the rating rounded to 1 decimal place
+    return rating.toFixed(1);
+  };
 
   const handleLikeIncrement = async (foodId) => {
     const userID = localStorage.getItem("authToken");
@@ -140,15 +156,18 @@ function TopRecipe() {
                 >
                   {item.foodName}
                 </Link>
-
               </div>
               <div className="flex">
-                {[...Array(Math.floor(Math.random() * 10))].map((_, starIndex) => (
+                {/* Displaying rating based on visitorCount and likeCount */}
+                {[...Array(5)].map((_, starIndex) => (
                   <IoStarSharp
                     key={starIndex}
-                    className={`text-yellow-400 ${starIndex > 0 ? "ml-1" : ""}`}
+                    className={`text-yellow-400 ${starIndex < Math.floor(calculateRating(item.likes, item.visitorCount)) ? "ml-1" : ""}`}
                   />
                 ))}
+                <span className="ml-2 text-gray-500">
+                  {calculateRating(item.likeCount, item.visitorCount)} / 5
+                </span>
               </div>
             </div>
           </div>
@@ -156,7 +175,6 @@ function TopRecipe() {
       </div>
     </div>
   );
-
 }
 
 
@@ -249,7 +267,7 @@ function Index() {
     async function categoryGetRequest() {
       try {
         const response = await axios.get(
-          "http://localhost:3001/api/category/all"
+          `${process.env.REACT_APP_API_URL}/category/popular`
         );
         setCategory(response.data.slice(0, 6));
       } catch (err) {

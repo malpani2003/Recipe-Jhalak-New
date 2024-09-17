@@ -20,13 +20,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookie_parser());
 app.use(express.json());
 app.use(compression());
+
 app.use(
   cors({
-      origin: 'http://localhost:3000',
-      optionsSuccessStatus: 200,
-      credentials: true,
+    origin: 'https://recipe-jhalak.netlify.app',
+    credentials: true, 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+    optionsSuccessStatus: 200,
   })
-); 
+);
 
 app.use(logger("dev"));
 

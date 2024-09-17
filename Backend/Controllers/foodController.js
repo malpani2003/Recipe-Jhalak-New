@@ -119,7 +119,7 @@ module.exports = {
   latestRecipe: async (req, res) => {
     try {
       const foodItemList = await Item_Collection.find({},{foodName:1,foodImg:1,likeCount:1,visitorCount:1})
-        .sort({ timestamp: -1 })
+        .sort({ createdAt: -1 })
         .limit(6);
 
       res.status(200).json(foodItemList);

@@ -47,7 +47,7 @@ function Navbar() {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    navigate(`/search?query=${searchQuery}`);
+    
   };
 
   return (

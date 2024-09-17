@@ -23,6 +23,10 @@ function CategoryWiseItem() {
   };
 
   useEffect(() => {
+    incrementVisitCount();
+  }, [categoryID]);
+
+  useEffect(() => {
     async function getItems() {
       try {
         const response = await axios.get(
@@ -30,7 +34,6 @@ function CategoryWiseItem() {
         );
         setFoodItem(response.data);
         setLoading(false);
-        incrementVisitCount();
       } catch (err) {
         setError("Error occurred while fetching data.");
         setLoading(false);
@@ -42,15 +45,21 @@ function CategoryWiseItem() {
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (e.target.value) {
+      newSearchParams.set(e.target.name, e.target.value);
+    } else {
+      newSearchParams.delete(e.target.name);
+    }
+    setSearchParams(newSearchParams);
   };
-
 
   if (loading) {
     return <Loading />;
   }
 
   if (error) {
-    return <ErrorPage/>;
+    return <ErrorPage />;
   }
 
   const paginate = (pageNumber) => {
@@ -59,51 +68,64 @@ function CategoryWiseItem() {
   };
 
   return (
-    <div className="container mx-auto p-4 min-h-screen">
-      <h2 className="text-center text-3xl font-bold mt-5 text-gray-800">
+    <div className="p-4 mx-auto min-h-screen">
+      <h2 className="text-center text-4xl font-bold mt-5 text-gray-900">
         Results for {foodItem.categoryName}
       </h2>
+      <p>{foodItem.Category_Desc}</p>
 
       {/* Filters */}
-      <div className="flex flex-wrap justify-center gap-4 mt-6 mb-8">
-        <select
-          name="difficulty"
-          value={filters.difficulty}
-          onChange={handleFilterChange}
-          className="bg-gray-200 p-2 rounded"
-        >
-          <option value="">Difficulty</option>
-          <option value="Easy">Easy</option>
-          <option value="Medium">Medium</option>
-          <option value="Hard">Hard</option>
-        </select>
+      <div className="flex flex-wrap justify-center gap-3 mt-6 mb-8">
+        <div className="w-full sm:w-1/3 lg:w-1/4">
+          <label htmlFor="difficulty" className="block text-gray-700 mb-2">Difficulty</label>
+          <select
+            id="difficulty"
+            name="difficulty"
+            value={filters.difficulty}
+            onChange={handleFilterChange}
+            className="w-full bg-gray-200 p-2 rounded"
+          >
+            <option value="">Select Difficulty</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
 
-        <select
-          name="time"
-          value={filters.time}
-          onChange={handleFilterChange}
-          className="bg-gray-200 p-2 rounded"
-        >
-          <option value="">Prep Time</option>
-          <option value="15">Up to 15 min</option>
-          <option value="30">Up to 30 min</option>
-          <option value="60">Up to 1 hour</option>
-        </select>
+        <div className="w-full sm:w-1/3 lg:w-1/4">
+          <label htmlFor="time" className="block text-gray-700 mb-2">Prep Time</label>
+          <select
+            id="time"
+            name="time"
+            value={filters.time}
+            onChange={handleFilterChange}
+            className="w-full bg-gray-200 p-2 rounded"
+          >
+            <option value="">Select Prep Time</option>
+            <option value="15">Up to 15 min</option>
+            <option value="30">Up to 30 min</option>
+            <option value="60">Up to 1 hour</option>
+          </select>
+        </div>
 
-        <select
-          name="country"
-          value={filters.country}
-          onChange={handleFilterChange}
-          className="bg-gray-200 p-2 rounded"
-        >
-          <option value="">Country</option>
-          <option value="India">India</option>
-          <option value="USA">USA</option>
-          <option value="Italy">Italy</option>
-        </select>
+        <div className="w-full sm:w-1/3 lg:w-1/4">
+          <label htmlFor="country" className="block text-gray-700 mb-2">Country</label>
+          <select
+            id="country"
+            name="country"
+            value={filters.country}
+            onChange={handleFilterChange}
+            className="w-full bg-gray-200 p-2 rounded"
+          >
+            <option value="">Select Country</option>
+            <option value="India">India</option>
+            <option value="USA">USA</option>
+            <option value="Italy">Italy</option>
+          </select>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      <div className="grid grid-col-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mt-6">
         {foodItem.foodList.length >= 1 ? (
           foodItem.foodList.map((item) => {
             const { _id, foodName, foodImg } = item;

@@ -9,6 +9,7 @@ import RecipeInstructions from "./RecipeInstructions";
 import WriteComment from "./WriteComment";
 import SimilarFoodItem from "./SimilarFoodItem";
 import RecipeHeader from "./RecipeHeader";
+import ErrorPage from "../404Page/ErrorPage";
 
 function NewRecipePage() {
   const [recipe, setRecipe] = useState({});
@@ -48,13 +49,13 @@ function NewRecipePage() {
         console.error("Error fetching data:", err);
         setLoading(false);
         setError(err.message);
-      }
+      } 
     };
     fetchData();
   }, [foodId]);
 
   if (loading) return <Loading />;
-  if (error) return <h2 className="text-red-500 text-center">Error Occurred: {error}</h2>;
+  if (error) return <h2 className="text-red-500 text-center"><ErrorPage></ErrorPage></h2>;
   if (!recipe) return null;
 
   return (

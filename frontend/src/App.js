@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
 import Footer from "./Components/Footer/Footer";
@@ -12,20 +12,21 @@ import ShowCategory from "./Components/Category/ShowCategory";
 import Filter from "./Components/Filter/Filter";
 import FoodForm from "./Components/Food/FoodForm";
 import UserProfile from "./Components/Profile/UserProfile";
-import Index from "./Components/Category/Index";
+import Index from "./Components/Home/Index";
 import SearchFood from "./Components/Food/SearchFood";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NewProfile from "./Components/Profile/NewUserProfile";
 import ContactUs from "./Components/Contact/ContactUs";
-
+import { AuthContext } from "./authContext";
 function App() {
+  const [isLogin, setIsLogin] = useState(false);
   return (
-    <div>
+    <AuthContext.Provider value={{isLogin,setIsLogin}}>
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Index />} exact />
+          <Route path="/" element={<Index />} />
           <Route path="/category/:category" element={<CategoryWiseItem />} />
           <Route path="/food/add" element={<FoodForm />} />
           <Route path="/category" element={<ShowCategory />} />
@@ -34,14 +35,14 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/filter" element={<Filter />} />
-          <Route path="/profile" element={<UserProfile></UserProfile>} />
-          <Route path="/contact" element={<ContactUs></ContactUs>} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/contact" element={<ContactUs />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
         <Footer />
+        <ToastContainer />
       </BrowserRouter>
-      <ToastContainer></ToastContainer>
-    </div>
+    </AuthContext.Provider>
   );
 }
 

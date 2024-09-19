@@ -1,11 +1,14 @@
 import React, { useState } from "react";
+import { useContext } from 'react';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaRegUserCircle } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { ChefHat } from "lucide-react";
+import { AuthContext } from "../../authContext";
 function Login() {
   const [email, setEmail] = useState("");
+  const { isLogin, setIsLogin } = useContext(AuthContext);
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [responseMsg, setResponseMsg] = useState(null);
@@ -15,7 +18,10 @@ function Login() {
     event.preventDefault();
 
     if (!email || !password) {
-      setResponseMsg({ type: "danger", msg: "Email and password are required." });
+      setResponseMsg({
+        type: "danger",
+        msg: "Email and password are required.",
+      });
       return;
     }
 
@@ -33,10 +39,16 @@ function Login() {
         // localStorage.setItem("authToken", authToken);
         setResponseMsg({ type: "success", msg: "Login successful!" });
         navigate("/profile");
+        setIsLogin(true);
       } else {
-        setResponseMsg({ type: "danger", msg: "Unexpected response from the server." });
+        setResponseMsg({
+          type: "danger",
+          msg: "Unexpected response from the server.",
+        });
+        setIsLogin(false);
       }
     } catch (error) {
+      setIsLogin(false);
       setResponseMsg({
         type: "danger",
         msg: error.response?.data?.message || "An error occurred during login.",
@@ -48,10 +60,14 @@ function Login() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
         <div className="flex align-items-center justify-center">
-        <ChefHat size={50}></ChefHat>
+          <ChefHat size={50}></ChefHat>
         </div>
-        <h1 className="text-3xl font-bold text-gray-800 text-center">Welcome Back</h1>
-        <p className="text-gray-600 text-center mt-2">Sign in with Email and Password</p>
+        <h1 className="text-3xl font-bold text-gray-800 text-center">
+          Welcome Back
+        </h1>
+        <p className="text-gray-600 text-center mt-2">
+          Sign in with Email and Password
+        </p>
 
         {responseMsg && (
           <div
@@ -66,7 +82,6 @@ function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-
           <div className="relative">
             <FaRegUserCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input

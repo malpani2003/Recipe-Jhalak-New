@@ -27,8 +27,8 @@ const isAdmin = async (req, res, next) => {
     }
 
   } catch (error) {
-    console.error("Error verifying token:", error);
-    return res.status(401).json({ message: "Invalid or expired token." });
+    console.error("Error verifying token:", error); 
+    return res.status(401).json({ message: "Invalid or expired token." }); 
   }
 };
 

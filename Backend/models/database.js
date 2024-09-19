@@ -10,7 +10,7 @@ mongoose
   .then(() => {
     console.log("Database connected");
   })
-  .catch((err) => console.error("Database is not connected:", err.message));
+  .catch((err) => console.error("Database is not connected:", err.message)); 
 
 const categorySchema = new mongoose.Schema(
   {
@@ -128,7 +128,7 @@ const likeSchema = new mongoose.Schema(
     foodId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "items",
-      required: true,
+      required: true, 
     },
     createdAt: {
       type: Date,

@@ -1,6 +1,7 @@
 require("dotenv").config();
 const UserCollection = require("../models/database").users;
 const Verification = require("../models/database").verification;
+const Like = require("../models/database").like;
 
 const bcryptjs = require("bcryptjs");
 const jsonwebtoken = require("jsonwebtoken");
@@ -14,11 +15,11 @@ const transportar = nodemailer.createTransport({
   secure: false,
   auth: {
     user: process.env.AUTH_EMAIL,
-    pass: process.env.AUTH_PASS,
+    pass: process.env.AUTH_PASS, 
   },
 });
 function getToken(id) {
-  return jsonwebtoken.sign({ id }, secretId, { expiresIn: expiresIn + "h" });
+  return jsonwebtoken.sign({ id }, secretId, { expiresIn: expiresIn + "h" }); 
 }
 
 // function EmailSend() {
@@ -34,64 +35,47 @@ function getToken(id) {
 // }
 
 // EmailSend()
+async function sendVerificationEmail({ _id, Email_id, Name }) {
+  try {
+    const uniqueString = uuidv4() + _id;
+    const verificationLink = `https://recipe-jhalak-new.onrender.com/api/users/verify-email/${_id}/${uniqueString}`;
 
-async function sendVerificationEmail({ _id, Email_id, Name }) { 
-  // Email content
-  const emailContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification</title>
-</head>
-<body>
-    <div style="font-family: Arial, sans-serif; max-width: 600px;">
+    const emailContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px;">
         <h2>Email Verification</h2>
-        <p>Dear, {{Name}}</p>
-        <p>Thank you for Registering with RecipeJhalak . To Complete registration Please click the following link to verify your email address:</p>
-        <p><a href="http://localhost:3001/api/users/verify-email/{{id}}/{{verificationToken}}" target="_blank">Verify Email</a></p>
-        <p>Once your Account is Verified you can access any recipe on our Platform</p>
+        <p>Dear, ${Name}</p>
+        <p>Thank you for registering with RecipeJhalak. To complete registration, click the following link to verify your email address:</p>
+        <p><a href="${verificationLink}" target="_blank">Verify Email</a></p>
         <p>If you did not request this, please ignore this email.</p>
-        <p>Thank you,</p>
-        <p>Recipe Jhalak</p>
-    </div>
-</body>
-</html>
-`;
-  const uniqueString = uuidv4() + _id;
+        <p>Thank you,<br/>Recipe Jhalak</p>
+      </div>
+    `;
 
-  const mailOptions = {
-    from: process.env.AUTH_EMAIL,
-    to: Email_id, // receiver
-    subject: "Recipe Jhalak - Verification Link", // Subject line
-    html: emailContent
-      .replace("{{Name}}", Name)
-      .replace("{{verificationToken}}", uniqueString)
-      .replace("{{id}}", _id),
-  };
+    // Create a hashed unique verification string
+    const hashUniqueString = await bcryptjs.hash(uniqueString, 10);
+    const newVerification = new Verification({
+      userId: _id,
+      verificationString: hashUniqueString,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 1000 * 60 * 5, // 5 minutes expiration
+    });
 
-  const hashUniqueString = await bcryptjs.hash(uniqueString, 10);
-  const newVerificationData = new Verification({
-    userId: _id,
-    verificationString: hashUniqueString,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 1000 * 60 * 5,
-  });
-  const result = await newVerificationData.save();
-  if (!result) {
-    console.log("Verifcation Link cannot be not send");
+    await newVerification.save();
+
+    const mailOptions = {
+      from: process.env.AUTH_EMAIL,
+      to: Email_id,
+      subject: "Recipe Jhalak - Verify Your Email",
+      html: emailContent,
+    };
+
+    // Send the email
+    await transportar.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Failed to send verification email:", error.message);
     return false;
   }
-  transportar.sendMail(mailOptions, (err, info) => {
-    if (err) {
-      console.log("Verification link is not send");
-      return false;
-    } else {
-      console.log("Verification Link is send: ", info);
-      return true;
-    }
-  });
 }
 
 const registerUser = async (request, response) => {
@@ -146,7 +130,7 @@ const registerUser = async (request, response) => {
     return response.status(201).send({
       error: false,
       message: successMessage,
-      token: authToken,
+      token: tokenId,
     });
   } catch (error) {
     return response
@@ -233,6 +217,19 @@ const userProfile = async (request, response) => {
   }
 };
 
+const getLikedRecipes = async (req, res) => {
+  try {
+    const userId = req.user; 
+    console.log(userId);
+    const likes = await Like.find({ userId:userId},{createdAt:0,updatedAt:0}).populate("foodId","foodName foodImg");
+    const likeRecipe=likes.map((like)=>like.foodId);
+    return res.status(200).json({ likeRecipe });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Unable to fetch liked recipes" });
+  }
+};
+
 const authCheck = (req, res) => {
   const token = req.cookies["Token"];
   console.log(token);
@@ -259,146 +256,6 @@ module.exports = {
   postLogin,
   userProfile,
   logout,
-  authCheck
+  authCheck,
+  getLikedRecipes
 };
-// module.exports = {
-
-//     Post_Register: async (request, response) => {
-//         // response.render("login");
-//         User_data = request.body;
-//         if (request.body.password != request.body.cpassword) {
-
-//             response.render("register", { error: 1, message: "Confirm Password is not same as Password" });
-
-//         }
-//         else {
-//             Check_User_Already = await UserCollection.find({ Email_id: User_data.email });
-//             if (Check_User_Already.length != 0) {
-//                 response.render("register", { error: 1, message: "User with Email id Already Exist" });
-//             }
-//             else {
-//                 const Hash_password = bcryptjs.hashSync(User_data.password, 10);
-//                 const new_user = new UserCollection({
-//                     Name: (User_data.name).trim(),
-//                     Email_id: ((User_data.email).toLowerCase()).trim(),
-//                     Password: (Hash_password).trim()
-//                 });
-//                 Result = await new_user.save();
-//                 if (Result) {
-
-//                     let Token_id=get_token(Result._id);
-//                     // request.setcookie()
-//                     response.cookie("ID",Token_id,{secure:true,httpOnly:true});
-//                     const Today=new Date().toLocaleDateString()
-//                     await UserCollection.updateOne({ _id: Result._id}, { $set: { LastActive: Today } });
-//                     // response.redirect(`/otp_verification/${Result._id}`,);
-//                     // response.redirect("/login");
-//                     response.redirect(`/UserProfile/${Result._id}`);
-//                 }
-//                 else {
-//                     response.redirect("/register");
-//                 }
-//             }
-//         }
-//     },
-//     Get_login: (request, response) => {
-
-//         response.render("login", { error: 0, message: null });
-//     },
-//     Post_login: async(request, response) => {
-//         // response.render("login");
-//         console.log(request.body);
-//         Check_User_Already = await UserCollection.find({ Email_id: (request.body.email).toLowerCase()});
-//         // response.send(Check_User_Already);
-//         if(Check_User_Already.length==1){
-//             const RealPassword=Check_User_Already[0].Password;
-//             const CheckPassword=bcryptjs.compareSync(request.body.password,RealPassword);
-//             console.log(CheckPassword);
-//             if(CheckPassword){
-//                 // response.send("User Exist");
-//                 const Today=new Date().toLocaleDateString()
-
-//                 let Token_id=get_token(Check_User_Already[0]._id);
-//                 // request.setcookie()
-//                 response.cookie("ID",Token_id,{secure:true,httpOnly:true});
-//                 await UserCollection.updateOne({ _id: Check_User_Already[0]._id}, { $set: { LastActive: Today } });
-
-//                  response.redirect(`/UserProfile/${Check_User_Already[0]._id}`);
-
-//             }
-//             else{
-//                 response.render("login", { error: 1, message: "Entered Incorrect Password" });
-
-//             }
-//         }
-//         else{
-//             // response.send("User not Exist")
-//             response.render("login", { error: 1, message: "User Doesnot Exist . Please Register" });
-
-//         }
-
-//     },
-//     // OTP_Verification_get: async (request, response) => {
-
-//     //     // response.send(request.params);
-
-//     //     let random_number = ""
-//     //     for (i = 0; i < 4; i++) {
-//     //         random_number += Math.floor(Math.random() * 10);
-//     //     }
-//     //     OTP = {
-//     //         user_id: request.params.user_id,
-//     //         number: random_number
-//     //     }
-
-//     //     user_data = await UserCollection.find({ _id: request.params.user_id });
-//     //     if (user_data[0].OTP == null && user_data[0].Verified==false) {
-//     //         await UserCollection.updateOne({ _id: request.params.user_id }, { $set: { "OTP": random_number } });
-//     //     }
-//     //     user_data = await UserCollection.find({ _id: request.params.user_id });
-//     //     // response.send(user_data);
-//     //     response.render("otp_verification", { id: request.params.user_id });
-//     //     // response.send(OTP);
-
-//     // },
-//     // OTP_Verification_post: async (request, response) => {
-//     //     // response.send(request.params);
-
-//     //     user_data = await UserCollection.find({ _id: request.params.user_id });
-//     //     // response.send(user_data);
-//     //     console.log(user_data[0].OTP, request.body.otp);
-//     //     if (parseInt(user_data[0].OTP) == request.body.otp) {
-//     //         // response.send("Verified");
-//     //         await UserCollection.updateOne({ _id: request.params.user_id }, { $set: { "Verified": true } });
-//     //         UserCollection.updateOne({ _id: request.params.user_id },{$unset:{"OTP":1}})
-
-//     //         response.redirect(`/UserProfile/${request.params.user_id}`);
-
-//     //       }
-//     //     else {
-//     //         response.send("NOOOOOOO")
-//     //     }
-//     //     // response.render("otp_verification",{id:request.params.user_id});
-//     //     // response.send(OTP);
-
-//     // },
-//     // OTP_Verification_fail:async(request,response)=>{
-//     //     // response.send(request.params.user_id);
-//     //     await UserCollection.updateOne({ _id: request.params.user_id }, { $set: { "OTP": null } });
-//     //     response.clearCookie("ID");
-//     //     // response.render("login", { error: 1, message: "Verification Failed . Verify by Login " });
-//     //     response.redirect("/logout")
-
-//     // },
-//     User_profile:async(request,response)=>{
-//         // response.send(request.params.user_id);
-//         user_data = await UserCollection.find({ _id: request.params.user_id });
-//         // cons
-//         response.render("UserProfile",{list:user_data})
-
-//     },
-//     Logout_User:async(request,response)=>{
-//         response.clearCookie("ID");
-//         response.redirect("/login");
-//     }
-// }

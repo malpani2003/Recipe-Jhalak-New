@@ -24,6 +24,12 @@ module.exports = {
   addFood2: async (req, res) => {
     try {
       const food = req.body;
+      if (req.file && req.file.path) {
+        food.foodImg = req.file.path;
+        food.previewImg = req.file.path;
+      } else {
+        res.status(400).json({ error: "No file Selected" });
+      }
       food["isDrink"] = food["isDrink"] === "Yes";
       const newRecipe = new Item_Collection(food);
       const result = await newRecipe.save();
@@ -33,7 +39,7 @@ module.exports = {
     }
   },
 
-  getFoodDetails: async (req, res) => {
+  getFoodDetails: async (req, res) => { 
     try {
       const { food_id } = req.params;
       const foodData = await Item_Collection.findById(food_id);
@@ -118,7 +124,10 @@ module.exports = {
 
   latestRecipe: async (req, res) => {
     try {
-      const foodItemList = await Item_Collection.find({},{foodName:1,foodImg:1,likeCount:1,visitorCount:1})
+      const foodItemList = await Item_Collection.find(
+        {},
+        { foodName: 1, foodImg: 1, likeCount: 1, visitorCount: 1 }
+      )
         .sort({ createdAt: -1 })
         .limit(6);
 
@@ -130,8 +139,11 @@ module.exports = {
 
   mostLikeRecipe: async (req, res) => {
     try {
-      const foodItemList = await Item_Collection.find({},{foodName:1,foodImg:1,likeCount:1,visitorCount:1})
-        .sort({likeCount:-1}) 
+      const foodItemList = await Item_Collection.find(
+        {},
+        { foodName: 1, foodImg: 1, likeCount: 1, visitorCount: 1 }
+      )
+        .sort({ likeCount: -1 })
         .limit(9);
 
       res.status(200).json(foodItemList);
@@ -187,7 +199,7 @@ module.exports = {
 
       const updatedRecipe = await Item_Collection.findByIdAndUpdate(
         foodId,
-        { $inc: { likeCount: 1 } }, 
+        { $inc: { likeCount: 1 } },
         { new: true }
       );
 
@@ -200,7 +212,7 @@ module.exports = {
       return res
         .status(200)
         .json({ message: "Recipe liked successfully", like: newLike });
-    } catch (error) { 
+    } catch (error) {
       console.error("Error in liking the recipe:", error);
       return res
         .status(500)

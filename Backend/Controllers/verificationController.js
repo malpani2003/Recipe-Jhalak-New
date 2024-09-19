@@ -33,7 +33,6 @@ const verifyLink = async (request, response) => {
         if (!updatedUser) {
             return response.sendFile(path.join(mainPath, '/public/static/verificationError.html'))
         }
-
         await Verification.findByIdAndDelete(_id);
         // return response.status(200).send({ error: false, message: "Verification successful" });
         return response.sendFile(path.join(mainPath, '/public/static/verificationSucess.html'))

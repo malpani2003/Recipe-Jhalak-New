@@ -80,9 +80,9 @@ const RecipeHeader = ({ recipeData }) => {
 
       <div className="container mx-auto mt-4">
         <nav aria-label="breadcrumb" className="text-sm breadcrumbs">
-          <ul className="flex">
+          <ul className="flex justify-center gap-2">
             <li>
-              <Link to="/category" className="text-blue-500 hover:underline">
+              <Link to="/category" className="text-blue-800 hover:underline hover:font-semibold">
                 Categories
               </Link>
             </li>
@@ -92,7 +92,7 @@ const RecipeHeader = ({ recipeData }) => {
             <li>
               <Link
                 to={`/category/${recipe.FoodDetails.foodCategoryId}`}
-                className="text-blue-500 hover:underline"
+                className="text-blue-800 hover:font-semibold hover:underline"
               >
                 {recipe.category}
               </Link>

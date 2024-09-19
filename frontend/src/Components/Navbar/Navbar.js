@@ -1,11 +1,12 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../authContext";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setisLogin] = useState(false);
+  const {isLogin, setIsLogin} = useContext(AuthContext)
   const [searchQuery, setSearchQuery] = useState(""); // State for search input
   const navigate = useNavigate();
 
@@ -13,19 +14,19 @@ function Navbar() {
     const authCheck = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/api/users/check",
+          `${process.env.REACT_APP_API_URL}/users/check`,
           {
             withCredentials: true,
           }
         );
         if (response.status === 200) {
-          setisLogin(true);
+          setIsLogin(true)
         } else {
-          setisLogin(false);
+          setIsLogin(false);
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
-        setisLogin(false);
+        setIsLogin(false);
       }
     };
     authCheck();
@@ -33,11 +34,11 @@ function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/users/logout"
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/users/logout`,{withCredentials:true}
       );
       if (response.status === 200) {
-        setisLogin(false);
+        setIsLogin(false);
         navigate("/login");
       }
     } catch (err) {
@@ -47,7 +48,6 @@ function Navbar() {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    
   };
 
   return (
@@ -85,7 +85,7 @@ function Navbar() {
               Categories
             </Link>
             {/* Profile and Logout Links */}
-            {isLoggedIn ? (
+            {isLogin ? (
               <>
                 <Link
                   to="/profile"
@@ -154,7 +154,7 @@ function Navbar() {
             Categories
           </Link>
           {/* Profile and Logout Links */}
-          {isLoggedIn ? (
+          {isLogin ? (
             <>
               <Link
                 to="/profile"

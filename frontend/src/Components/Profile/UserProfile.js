@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Avatar from "react-avatar";
-import { FaHeart, FaBookmark, FaTimes } from "react-icons/fa";
+import { FaHeart, FaTimes } from "react-icons/fa";
 
 const UserProfile = () => {
-  const [selectedTab, setSelectedTab] = useState("liked");
-  const [recipes, setRecipes] = useState(null);
+  const [recipes, setRecipes] = useState([]);
   const [userData, setUserData] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -22,7 +21,7 @@ const UserProfile = () => {
           { withCredentials: true }
         );
         setUserData(response.data.message);
-        fetchRecipes("liked");
+        fetchRecipes(); // Fetch liked recipes initially
       } catch (error) {
         setUserData(null);
         setError("Unable to fetch profile data.");
@@ -37,31 +36,25 @@ const UserProfile = () => {
   if (!userData && !loading) {
     navigate("/login");
   }
-  
-  const fetchRecipes = async (type) => {
+
+  const fetchRecipes = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:3001/api/users/${type}recipes`,
-        { withCredentials: true }
-      );
-      setRecipes(response.data);
-      setSelectedTab(type); // Ensure this is updated correctly
+      const response = await axios.get("http://localhost:3001/api/users/likedrecipes", { withCredentials: true });
+      setRecipes(response.data.likeRecipe);
     } catch (error) {
-      setRecipes(null);
-      setError(`Unable to fetch ${type} recipes.`);
+      setRecipes([]);
+      setError("Unable to fetch liked recipes.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex">
+    <div className="flex flex-col md:flex-row">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} userData={userData} />
       <Content
         recipes={recipes}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
         fetchRecipes={fetchRecipes}
         loading={loading}
         error={error}
@@ -77,12 +70,12 @@ const Sidebar = ({ isOpen, setIsOpen, userData }) => {
         className="btn btn-primary m-2 p-2"
         onClick={() => setIsOpen(true)}
       >
-        <FaBookmark />
+        <FaHeart />
       </button>
     );
 
   return (
-    <div className="bg-gray-100 p-4 h-screen w-72">
+    <div className="bg-gray-100 p-4 h-screen w-full md:w-72">
       <div className="flex justify-between mb-6">
         <h2 className="text-xl font-bold">Profile</h2>
         <button className="text-gray-500" onClick={() => setIsOpen(false)}>
@@ -112,75 +105,49 @@ const Sidebar = ({ isOpen, setIsOpen, userData }) => {
   );
 };
 
-const Content = ({
-  recipes,
-  selectedTab,
-  setSelectedTab,
-  fetchRecipes,
-  loading,
-  error,
-}) => (
-  <div className="flex-grow p-6">
-    <div className="flex justify-between items-center mb-6">
-      <h2 className="text-2xl font-bold">
-        {selectedTab === "liked" ? "Liked Recipes" : "Saved Recipes"}
-      </h2>
-      <div className="flex items-center">
-        <FaHeart
-          className={`mr-2 ${
-            selectedTab === "liked" ? "text-red-500" : "text-gray-500"
-          }`}
-        />
-        <label className="flex items-center cursor-pointer">
-          <span className="mr-2">Toggle</span>
-          <input
-            type="checkbox"
-            className="hidden"
-            checked={selectedTab === "saved"}
-            onChange={() =>
-              fetchRecipes(selectedTab === "liked" ? "saved" : "liked")
-            }
-          />
-          <span
-            className={`block w-14 h-8 rounded-full ${
-              selectedTab === "saved" ? "bg-blue-600" : "bg-gray-300"
-            } relative`}
-          >
-            <span
-              className={`block w-6 h-6 bg-white rounded-full absolute transition-transform duration-300 ${
-                selectedTab === "saved" ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </span>
-        </label>
-        <FaBookmark
-          className={`ml-2 ${
-            selectedTab === "saved" ? "text-blue-500" : "text-gray-500"
-          }`}
-        />
-      </div>
-    </div>
-
-    {loading ? (
-      <div className="flex justify-center">
-        <div className="spinner-border" role="status">
-          <span className="sr-only">Loading...</span>
+const Content = ({ recipes, fetchRecipes, loading, error }) => {
+  const navigate = useNavigate();
+  return (
+    <div className="flex-grow p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Liked Recipes</h2>
+        <div className="flex items-center">
+          <FaHeart className="text-red-500 mr-2" />
         </div>
       </div>
-    ) : error ? (
-      <p className="text-red-500">{error}</p>
-    ) : !recipes ? (
-      <p>No {selectedTab} recipes found.</p>
-    ) : (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {recipes?.map((recipe, index) => (
-          <div key={index} className="bg-white p-4 shadow-md rounded-lg">
-            <h3 className="text-lg font-semibold">{recipe.name}</h3>
+
+      {loading ? (
+        <div className="flex justify-center">
+          <div className="spinner-border" role="status">
+            <span className="sr-only">Loading...</span>
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
+        </div>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : !recipes.length ? (
+        <p>No liked recipes found.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {recipes.map((recipe) => (
+            <div
+              key={recipe._id}
+              className="bg-white p-2 shadow-md rounded-lg cursor-pointer"
+              onClick={() => navigate(`/food/${recipe._id}`)}
+            >
+              <img
+                src={recipe.foodImg}
+                alt={recipe.foodName}
+                className="w-full h-40 object-cover rounded-lg mb-2"
+              />
+              <h3 className="text-lg font-semibold text-center">
+                {recipe.foodName}
+              </h3>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default UserProfile;

@@ -175,8 +175,9 @@ const postLogin = async (request, response) => {
     const tokenId = getToken(checkUserAlready._id);
     response.cookie("Token", tokenId, {
       path: "/",
-      expiresIn: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24, // Set the expiration time
+      sameSite:"None",
+      secure:true,
       httpOnly: true,
     });
     // response.header("Authorization", `Bearer ${tokenId}`);
@@ -242,12 +243,10 @@ const authCheck = (req, res) => {
   }
 };
 const logout=(req, res) => {
-    // Clear the authentication token cookie
     res.clearCookie('Token', {
-      httpOnly: true,   // Set to true if using HTTPS
-      sameSite: 'lax', // Helps protect against CSRF attacks
+      httpOnly: true, 
+      sameSite: 'None',
     });
-    // Send response to confirm logout
     res.status(200).send({ message: "Logout successful" });
 }
 

@@ -31,7 +31,7 @@ const FoodForm = () => {
       try {
         setLoading(true);
         // Fetch categories
-        const categoryResponse = await axios.get(`${process.env.REACT_APP_API_URL}category/all`);
+        const categoryResponse = await axios.get(`${process.env.REACT_APP_API_URL}/category/all`);
         setCategories(categoryResponse.data);
 
         // Fetch countries

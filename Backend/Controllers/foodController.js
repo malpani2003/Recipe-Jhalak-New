@@ -30,6 +30,7 @@ module.exports = {
       } else {
         res.status(400).json({ error: "No file Selected" });
       }
+      console.log(food);
       food["isDrink"] = food["isDrink"] === "Yes";
       const newRecipe = new Item_Collection(food);
       const result = await newRecipe.save();

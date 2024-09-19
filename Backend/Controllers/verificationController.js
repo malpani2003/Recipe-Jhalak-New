@@ -12,7 +12,7 @@ const verifyLink = async (request, response) => {
     const mainPath=dirName.join("/");
     try {
         const result = await Verification.findOne({ userId: userId });
-        console.log(result)
+        // console.log(result)
         if (!result || result.length < 0 ) {
             return response.sendFile(path.join(mainPath, '/public/static/verificationError.html'))
         }

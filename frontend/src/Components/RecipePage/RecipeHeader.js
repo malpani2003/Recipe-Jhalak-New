@@ -194,9 +194,9 @@ const RecipeHeader = ({ recipeData }) => {
                   value: recipe.FoodDetails.foodArea,
                 },
                 {
-                  icon: FaLeaf, // Vegetarian/Vegan-related icon
+                  icon: FaLeaf, 
                   label: "Veg / Non-Veg",
-                  value: "Veg",
+                  value: "",
                 },
               ].map((item, index) => (
                 <div key={index} className="mb-3 mx-2">

@@ -20,25 +20,25 @@ app.use(express.json());
 app.use(compression());
 
 
-app.use(
-  cors({
-    origin: 'https://recipe-jhalak.netlify.app',
-    credentials: true, 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-    allowedHeaders: ['Content-Type', 'Authorization'], 
-    optionsSuccessStatus: 200,
-  })
-);
-
 // app.use(
 //   cors({
-//     origin: 'http://localhost:3000',
+//     origin: 'https://recipe-jhalak.netlify.app',
 //     credentials: true, 
 //     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
 //     allowedHeaders: ['Content-Type', 'Authorization'], 
-//     optionsSuccessStatus: 200, 
+//     optionsSuccessStatus: 200,
 //   })
 // );
+
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true, 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+    optionsSuccessStatus: 200, 
+  })
+);
 
 app.use(logger("dev"));
 

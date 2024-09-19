@@ -30,7 +30,7 @@ module.exports = {
       } else {
         res.status(400).json({ error: "No file Selected" });
       }
-      console.log(food);
+      // console.log(food);
       food["isDrink"] = food["isDrink"] === "Yes";
       const newRecipe = new Item_Collection(food);
       const result = await newRecipe.save();
@@ -144,30 +144,10 @@ module.exports = {
         {},
         { foodName: 1, foodImg: 1, likeCount: 1, visitorCount: 1 }
       )
-        .sort({ likeCount: -1 })
+        .sort({ likeCount: -1,visitorCount:-1 })
         .limit(9);
 
       res.status(200).json(foodItemList);
-    } catch (error) {
-      res.status(500).json({ error: `Internal Server Error ${error.message}` });
-    }
-  },
-
-  addComment: async (req, res) => {
-    try {
-      const { foodId, comment, date } = req.body;
-      const userData = await UserCollection.findById(req.user, { Name: 1 });
-      const newComment = {
-        userName: userData?.Name || "Anonymous",
-        comment,
-        date,
-      };
-      const updatedItem = await Item_Collection.findByIdAndUpdate(
-        foodId,
-        { $push: { comments: newComment } },
-        { new: true }
-      );
-      res.status(200).json(updatedItem);
     } catch (error) {
       res.status(500).json({ error: `Internal Server Error ${error.message}` });
     }

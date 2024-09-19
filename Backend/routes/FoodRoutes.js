@@ -12,7 +12,6 @@ router.get("/mostLiked",foodController.mostLikeRecipe);
 router.post("/like",authMiddleware.verifyToken,FoodControllers.likeRecipe);
 router.get("/filter",FoodControllers.getFilterFoodData);
 router.delete("/:food_id",authMiddleware.isAdmin,FoodControllers.deleteFood);
-router.post("/:food_id",authMiddleware.verifyToken,FoodControllers.addComment);
 router.put("/visit/:foodId",FoodControllers.visitRecipe);
 router.get("/:food_id",FoodControllers.getFoodDetails);
 

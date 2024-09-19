@@ -60,6 +60,7 @@ const FoodForm = () => {
       ...prevData,
       foodInstruction: value.split('\n').filter(Boolean),
     }));
+    console.log(formData)
   };
 
   const handleIngreChange = (value) => {

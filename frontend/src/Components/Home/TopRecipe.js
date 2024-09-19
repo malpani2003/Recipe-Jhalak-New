@@ -4,38 +4,34 @@ import { Link } from "react-router-dom";
 import { IoStarSharp } from "react-icons/io5";
 
 const TopRecipe = () => {
-  const [recipe, setRecipe] = useState([]);
+  const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
-    async function allFoodGetRequest() {
+    async function fetchTopRecipes() {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/food/mostLiked`);
-        const recipeData = response.data;
-        setRecipe(recipeData);
+        setRecipes(response.data);
       } catch (err) {
-        console.log("Error Occurred");
+        console.error("Error Occurred:", err.message);
       }
     }
-    allFoodGetRequest();
+    fetchTopRecipes();
   }, []);
 
   const calculateRating = (likeCount, visitorCount) => {
-    const maxLikes = 1000;
-    const maxVisitors = 5000;
-    const likeRatio = Math.min(likeCount / maxLikes, 1);
-    const visitorRatio = Math.min(visitorCount / maxVisitors, 1);
-    const rating = (likeRatio * 0.7 + visitorRatio * 0.3) * 5;
-    return rating.toFixed(1);
+    if (visitorCount === 0) return 0; // Avoid division by zero
+    const likeRatio = Math.min(likeCount / visitorCount, 1);
+    return (likeRatio * 5).toFixed(1);
   };
 
   return (
     <div className="container mx-auto mb-5 px-4">
-      <h2 className="text-3xl font-bold mb-4">Top Most Liked Recipes</h2>
+      <h2 className="text-3xl font-bold mb-4 text-gray-800">Top Most Liked Recipes</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {recipe.map((item, index) => (
+        {recipes.map((item) => (
           <div
             className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105"
-            key={index}
+            key={item._id}
           >
             <img
               src={item.foodImg}
@@ -51,16 +47,23 @@ const TopRecipe = () => {
                   {item.foodName}
                 </Link>
               </div>
-              <div className="flex">
-                {[...Array(5)].map((_, starIndex) => (
-                  <IoStarSharp
-                    key={starIndex}
-                    className={`text-yellow-400 ${starIndex < Math.floor(calculateRating(item.likes, item.visitorCount)) ? "ml-1" : ""}`}
-                  />
-                ))}
-                <span className="ml-2 text-gray-500">
-                  {calculateRating(item.likeCount, item.visitorCount)} / 5
-                </span>
+              <div className="flex items-center mb-2">
+                {/* Star Rating */}
+                {/* <div className="flex items-center">
+                  {[...Array(5)].map((_, starIndex) => (
+                    <IoStarSharp
+                      key={starIndex}
+                      className={`text-yellow-400 ${starIndex < Math.floor(calculateRating(item.likeCount, item.visitorCount)) ? "text-yellow-400" : "text-gray-300"}`}
+                    />
+                  ))}
+                  <span className="ml-2 text-gray-500">
+                    {calculateRating(item.likeCount, item.visitorCount)} / 5
+                  </span>
+                </div> */}
+              </div>
+              <div className="flex justify-between text-gray-600 text-sm">
+                <span className="bg-yellow-400 p-2 font-semibold text-violet-900 rounded-xl">Likes: {item.likeCount}</span>
+                {/* <span className="bg-yellow-400 p-2 font-semibold text-violet-900 rounded-xl">Visitors: {item.visitorCount}</span> */}
               </div>
             </div>
           </div>

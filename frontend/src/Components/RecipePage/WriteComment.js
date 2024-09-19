@@ -20,16 +20,14 @@ const WriteComment = ({ id }) => {
       setIsSubmitting(true);
       try {
         const response = await axios.post(
-          `http://localhost:3001/api/food/${id}`,
+          `${process.env.REACT_APP_API_URL}/food/${id}`,
           {
             comment: comment,
             foodId: id,
             date: new Date().toISOString(),
           },
           {
-            headers: {
-              Auth: localStorage.getItem("authToken"),
-            },
+            withCredentials:true
           }
         );
         setSubmissionMessage({

@@ -6,19 +6,24 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function Register() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [cpassword, setCpassword] = useState('');
+  const [PasswordErr, setPasswordErr] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const notifyDanger = (message) => {
     toast.error(message, { autoClose: 3000 });
   };
   const notifySuccess = (message) => {
     toast.success(message, { autoClose: 3000 });
   };
-  const [PasswordErr, setPasswordErr] = useState(false);
-  const [responseMsg, setResponseMsg] = useState(null);
+  const notifyInfo = (message) => {
+    toast.info(message, { autoClose: 3000 });
+  };
 
-  function handlePasswordMatch(event) {
-    const cpassword = document.getElementById("cpassword").value;
-    const password = document.getElementById("password").value;
-
+  function handlePasswordMatch() {
     if (cpassword !== password) {
       setPasswordErr(true);
     } else {
@@ -28,13 +33,9 @@ function Register() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const Checkbtn = document.getElementById("check");
 
     if (PasswordErr || !name || !email || !password) {
-      console.log("Cannot Submit form");
+      notifyDanger("Please fill all fields correctly.");
       return;
     }
 
@@ -42,42 +43,38 @@ function Register() {
       name,
       email,
       password,
-      cpassword: password,
+      cpassword,
       isAdmin: 0,
     };
 
     try {
-      const response = await axios.post("http://localhost:3001/api/users/register/", Data);
+      setLoading(true);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/register`, Data);
       notifySuccess("Verification Link sent to Email");
     } catch (error) {
       notifyDanger(error.response?.data?.message || "An error occurred during Register.");
+    } finally {
+      setLoading(false);
     }
   }
 
-  function handleShowPassword(event) {
-    const passwordBtn = document.getElementById("password");
-    const passwordBtnType = passwordBtn.getAttribute("type");
-    const passwordChangeBtn = document.getElementById("basic_addon1");
+  function handleShowPassword() {
+    const passwordField = document.getElementById("password");
+    const passwordType = passwordField.getAttribute("type");
+    const passwordToggleBtn = document.getElementById("basic_addon1");
 
-    if (passwordBtnType === "password") {
-      passwordBtn.setAttribute("type", "text");
-      passwordChangeBtn.innerText = "Hide Password";
+    if (passwordType === "password") {
+      passwordField.setAttribute("type", "text");
+      passwordToggleBtn.innerText = "Hide Password";
     } else {
-      passwordBtn.setAttribute("type", "password");
-      passwordChangeBtn.innerText = "Show Password";
+      passwordField.setAttribute("type", "password");
+      passwordToggleBtn.innerText = "Show Password";
     }
   }
 
   return (
-    <div className="container-fluid bg-gray-100 min-h-screen flex items-center justify-center">
+    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
       <div className="flex flex-col md:flex-row w-full max-w-4xl">
-        {/* <div className="md:w-1/2 flex items-center justify-center bg-cover bg-center p-6">
-          <img
-            src="https://img.freepik.com/free-photo/exploding-burger-with-vegetables-melted-cheese-black-background-generative-ai_157027-1734.jpg?size=626&ext=jpg&ga=GA1.1.1700460183.1713139200&semt=ais"
-            className="w-3/5 mt-6"
-            alt="Food"
-          />
-        </div> */}
         <form
           className="md:w-1/2 bg-white p-6 rounded-lg shadow-lg border border-gray-200"
           autoComplete="off"
@@ -88,49 +85,48 @@ function Register() {
             Register with Recipe Jhalak to receive the most recent recipes and
             information on website updates. Register by completing the form.
           </p>
-          {responseMsg && (
-            <div className={`alert alert-${responseMsg.type} flex items-center`} role="alert">
-              {responseMsg.msg}
-              <button
-                type="button"
-                className="btn-close ml-4"
-                aria-label="Close"
-                onClick={() => setResponseMsg(null)}
-              ></button>
-            </div>
-          )}
+
           <div className="mb-4">
             <div className="relative">
               <input
                 type="text"
                 name="name"
                 id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="form-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 placeholder="Name"
               />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <BsPersonCircle />
-              </div>
+              </div> */}
             </div>
           </div>
+
           <div className="mb-4">
             <div className="relative">
               <input
                 type="email"
                 name="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="form-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 placeholder="Email Id"
               />
             </div>
           </div>
+
           <div className="mb-4">
             <div className="relative">
-              <RiLockPasswordFill className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"></RiLockPasswordFill>
+              {/* <RiLockPasswordFill className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"></RiLockPasswordFill> */}
               <input
                 type="password"
                 name="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyUp={handlePasswordMatch}
                 className="form-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 placeholder="Password"
               />
@@ -143,7 +139,21 @@ function Register() {
               </div>
             </div>
           </div>
-          {PasswordErr && <div className="text-red-500 mb-2">Password is not matched</div>}
+
+          <div className="mb-4">
+            <input
+              type="password"
+              name="cpassword"
+              id="cpassword"
+              value={cpassword}
+              onChange={(e) => setCpassword(e.target.value)}
+              onKeyUp={handlePasswordMatch}
+              className="form-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              placeholder="Confirm Password"
+            />
+            {PasswordErr && <div className="text-red-500 mb-2">Passwords do not match</div>}
+          </div>
+
           <div className="mb-4">
             <input
               type="checkbox"
@@ -154,16 +164,16 @@ function Register() {
             />
             I agree to <b>Terms and Condition</b> and Privacy Policy
           </div>
+
           <button
             type="submit"
-            className="bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600"
-            onClick={handleSubmit}
+            className={`bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading}
           >
-            Create Account
+            {loading ? "Creating..." : "Create Account"}
           </button>
         </form>
       </div>
-      <ToastContainer />
     </div>
   );
 }

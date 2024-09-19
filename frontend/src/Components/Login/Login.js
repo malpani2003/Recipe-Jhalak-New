@@ -1,58 +1,53 @@
-import React, { useState } from "react";
-import { useContext } from 'react';
-import axios from "axios";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { FaRegUserCircle } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { ChefHat } from "lucide-react";
 import { AuthContext } from "../../authContext";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function Login() {
   const [email, setEmail] = useState("");
   const { isLogin, setIsLogin } = useContext(AuthContext);
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [responseMsg, setResponseMsg] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!email || !password) {
-      setResponseMsg({
-        type: "danger",
-        msg: "Email and password are required.",
-      });
+      toast.error("Email and password are required.");
       return;
     }
 
+    setIsLoading(true); // Start loading
+
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/users/login/",
+        `${process.env.REACT_APP_API_URL}/users/login/`,
         { email, password },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
-        // const authToken = response.data["token"];
-        // localStorage.setItem("authToken", authToken);
-        setResponseMsg({ type: "success", msg: "Login successful!" });
-        navigate("/profile");
         setIsLogin(true);
+        toast.success("Login successful! Redirecting...");
+        setTimeout(() => {
+          navigate("/profile");
+        }, 1000); // Redirect after a short delay
       } else {
-        setResponseMsg({
-          type: "danger",
-          msg: "Unexpected response from the server.",
-        });
         setIsLogin(false);
+        toast.error("Unexpected response from the server.");
       }
     } catch (error) {
       setIsLogin(false);
-      setResponseMsg({
-        type: "danger",
-        msg: error.response?.data?.message || "An error occurred during login.",
-      });
+      toast.error(error.response?.data?.message || "An error occurred during login.");
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -68,18 +63,6 @@ function Login() {
         <p className="text-gray-600 text-center mt-2">
           Sign in with Email and Password
         </p>
-
-        {responseMsg && (
-          <div
-            className={`mt-4 p-2 text-center rounded ${
-              responseMsg.type === "success"
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}
-          >
-            {responseMsg.msg}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div className="relative">
@@ -123,8 +106,9 @@ function Login() {
             <button
               type="submit"
               className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition duration-200"
+              disabled={isLoading} 
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </button>
           </div>
         </form>

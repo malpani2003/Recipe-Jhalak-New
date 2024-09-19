@@ -21,7 +21,7 @@
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:3001/api/users/profile", {
+//         const response = await axios.get("https://recipe-jhalak-new.onrender.com/api/users/profile", {
 //           withCredentials: true
 //         });
 //         console.log(response);

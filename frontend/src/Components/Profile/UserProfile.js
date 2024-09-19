@@ -17,7 +17,7 @@ const UserProfile = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:3001/api/users/profile",
+          `${process.env.REACT_APP_API_URL}/users/profile`,
           { withCredentials: true }
         );
         setUserData(response.data.message);
@@ -40,7 +40,7 @@ const UserProfile = () => {
   const fetchRecipes = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:3001/api/users/likedrecipes", { withCredentials: true });
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/likedrecipes`, { withCredentials: true });
       setRecipes(response.data.likeRecipe);
     } catch (error) {
       setRecipes([]);

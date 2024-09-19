@@ -12,7 +12,7 @@ function Filter() {
     async function getFoodData() {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/food/filter?name=${param.get("name")}`
+          `https://recipe-jhalak-new.onrender.com/api/food/filter?name=${param.get("name")}`
         );
         setfilterResult(response.data);
         setLoading(false);

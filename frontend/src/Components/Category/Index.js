@@ -30,7 +30,7 @@
 //     };
 //     try {
 //       const response = await axios.post(
-//         "http://localhost:3001/api/food/like/",
+//         "https://recipe-jhalak-new.onrender.com/api/food/like/",
 //         { foodId: foodId },
 //         config
 //       );
@@ -123,7 +123,7 @@
 //     };
 //     try {
 //       const response = await axios.post(
-//         "http://localhost:3001/api/food/like/",
+//         "https://recipe-jhalak-new.onrender.com/api/food/like/",
 //         { foodId: foodId },
 //         config
 //       );

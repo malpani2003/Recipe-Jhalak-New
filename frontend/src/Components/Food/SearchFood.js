@@ -17,7 +17,7 @@ function SearchFood() {
             const item = searchParams.get("item");
             try {
                 const response = await axios.get(
-                    `http://localhost:3001/api/food?item=${item}&pageNum=${currentPage}`
+                    `https://recipe-jhalak-new.onrender.com/api/food?item=${item}&pageNum=${currentPage}`
                 );
                 console.log(response.data)
                 setFoodItem(response.data);

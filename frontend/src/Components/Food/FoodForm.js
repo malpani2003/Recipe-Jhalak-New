@@ -31,7 +31,7 @@ const FoodForm = () => {
       try {
         setLoading(true);
         // Fetch categories
-        const categoryResponse = await axios.get("http://localhost:3001/api/category/all");
+        const categoryResponse = await axios.get(`${process.env.REACT_APP_API_URL}category/all`);
         setCategories(categoryResponse.data);
 
         // Fetch countries
@@ -88,7 +88,7 @@ const FoodForm = () => {
         formDataToSubmit.append('foodImg', foodImgFile);
       }
 
-      const response = await axios.post("http://localhost:3001/api/food/add", formDataToSubmit, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/food/add`, formDataToSubmit, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },withCredentials:true

@@ -245,6 +245,8 @@ const authCheck = (req, res) => {
 const logout=(req, res) => {
     res.clearCookie('Token', {
       httpOnly: true, 
+      secure:true,  
+      path:"/",
       sameSite: 'None',
     });
     res.status(200).send({ message: "Logout successful" });

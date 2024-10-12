@@ -72,6 +72,10 @@ const foodSchema = new mongoose.Schema(
       type:String,
       required: true
     },
+    foodType:{
+      type:String,
+      enum:["Vegan","Non-Vegetarian","Vegetarian"]
+    },
     foodArea: String,
     foodDesc: [String],
     isDrink: Boolean,
@@ -159,11 +163,10 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, "Incorrect Format of Email-Id"],
       validate: {
         validator: function (v) {
           return validator.isEmail(v);
-        },
+        }, 
         message: "Please Enter Correct Email-ID",
       },
     },

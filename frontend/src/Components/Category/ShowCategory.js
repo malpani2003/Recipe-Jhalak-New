@@ -178,9 +178,9 @@ function ShowCategory() {
                 >
                   {element["Category_Name"]}
                 </Link>
-                <p className="text-gray-600 mt-2">
+                {/* <p className="text-gray-600 mt-2">
                   {element["recipeListed"] || 120} Recipes
-                </p>
+                </p> */} 
               </div>
             </div>
           ))

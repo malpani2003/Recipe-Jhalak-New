@@ -48,6 +48,7 @@ const FoodForm = () => {
   }, []);
 
   const handleChange = (e) => {
+    console.log(e.target);
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,

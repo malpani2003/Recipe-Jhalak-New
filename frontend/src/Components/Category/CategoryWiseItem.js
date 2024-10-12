@@ -68,22 +68,24 @@ function CategoryWiseItem() {
   };
 
   return (
-    <div className="p-4 mx-auto min-h-screen">
+    <div className="p-4 mx-auto min-h-screen max-w-7xl">
       <h2 className="text-center text-4xl font-bold mt-5 text-gray-900">
-        Results for {foodItem.categoryName}
+        Results for <span className="text-yellow-600">{foodItem.categoryName}</span>
       </h2>
-      <p>{foodItem.Category_Desc}</p>
+      <p className="text-center text-gray-600 mb-8">{foodItem.Category_Desc}</p>
 
       {/* Filters */}
-      <div className="flex flex-wrap justify-center gap-3 mt-6 mb-8">
+      <div className="flex flex-wrap justify-center gap-3 bg-gray-100 p-4 rounded-lg shadow-md mt-6 mb-10">
         <div className="w-full sm:w-1/3 lg:w-1/4">
-          <label htmlFor="difficulty" className="block text-gray-700 mb-2">Difficulty</label>
+          <label htmlFor="difficulty" className="block text-gray-700 mb-2">
+            Difficulty
+          </label>
           <select
             id="difficulty"
             name="difficulty"
             value={filters.difficulty}
             onChange={handleFilterChange}
-            className="w-full bg-gray-200 p-2 rounded"
+            className="w-full bg-white p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
           >
             <option value="">Select Difficulty</option>
             <option value="Easy">Easy</option>
@@ -93,13 +95,15 @@ function CategoryWiseItem() {
         </div>
 
         <div className="w-full sm:w-1/3 lg:w-1/4">
-          <label htmlFor="time" className="block text-gray-700 mb-2">Prep Time</label>
+          <label htmlFor="time" className="block text-gray-700 mb-2">
+            Prep Time
+          </label>
           <select
             id="time"
             name="time"
             value={filters.time}
             onChange={handleFilterChange}
-            className="w-full bg-gray-200 p-2 rounded"
+            className="w-full bg-white p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
           >
             <option value="">Select Prep Time</option>
             <option value="15">Up to 15 min</option>
@@ -109,13 +113,15 @@ function CategoryWiseItem() {
         </div>
 
         <div className="w-full sm:w-1/3 lg:w-1/4">
-          <label htmlFor="country" className="block text-gray-700 mb-2">Country</label>
+          <label htmlFor="country" className="block text-gray-700 mb-2">
+            Country
+          </label>
           <select
             id="country"
             name="country"
             value={filters.country}
             onChange={handleFilterChange}
-            className="w-full bg-gray-200 p-2 rounded"
+            className="w-full bg-white p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
           >
             <option value="">Select Country</option>
             <option value="India">India</option>
@@ -125,32 +131,31 @@ function CategoryWiseItem() {
         </div>
       </div>
 
-      <div className="grid grid-col-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mt-6">
+      {/* Food Items Grid */}
+      <div className="grid grid-col-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {foodItem.foodList.length >= 1 ? (
           foodItem.foodList.map((item) => {
             const { _id, foodName, foodImg } = item;
             return (
-              <div key={_id} className="relative group">
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                  <img
-                    src={foodImg}
-                    alt={foodName}
-                    className="w-full h-56 object-cover transition-transform duration-300 transform group-hover:scale-105"
-                  />
-                  <div className="p-4">
-                    <Link
-                      to={`/food/${_id}`}
-                      className="block text-lg font-bold text-gray-800 hover:text-red-500 transition-colors duration-200 text-center"
-                    >
-                      {foodName}
-                    </Link>
-                  </div>
+              <div key={_id} className="relative group bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
+                <img
+                  src={foodImg}
+                  alt={foodName}
+                  className="w-full h-56 object-cover transition-transform duration-300"
+                />
+                <div className="p-4">
+                  <Link
+                    to={`/food/${_id}`}
+                    className="block text-lg font-bold text-gray-800 hover:text-yellow-500 transition-colors duration-300 text-center"
+                  >
+                    {foodName}
+                  </Link>
                 </div>
               </div>
             );
           })
         ) : (
-          <div className="text-center my-10">
+          <div className="text-center my-10 text-gray-700">
             Uh oh, it seems there are no recipes matching your search.
           </div>
         )}
@@ -174,13 +179,13 @@ const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
   }
 
   return (
-    <nav>
-      <ul className="flex justify-center mt-8">
+    <nav className="flex justify-center mt-8">
+      <ul className="flex space-x-2">
         {pageNumbers.map((number) => (
-          <li key={number} className="mx-1">
+          <li key={number}>
             <button
               onClick={() => paginate(number)}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-600 transition duration-300"
+              className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-full transition-all duration-300"
             >
               {number}
             </button>

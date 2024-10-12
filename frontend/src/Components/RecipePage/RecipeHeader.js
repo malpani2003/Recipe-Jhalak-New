@@ -6,7 +6,8 @@ import {
   FaPrint,
   FaClock,
   FaMapMarkerAlt,
-  FaLeaf,FaChartLine,
+  FaLeaf,
+  FaChartLine,
   FaUtensils,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -17,12 +18,40 @@ import "react-toastify/dist/ReactToastify.css";
 
 const RecipeHeader = ({ recipeData }) => {
   const [recipe, setRecipe] = useState({});
+  const [likeCount, setLikeCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false); // New state to track if the recipe is liked
 
   useEffect(() => {
     if (recipeData) {
       setRecipe(recipeData);
+      fetchLikeCount(recipeData.FoodDetails._id);
+      checkIfLiked(recipeData.FoodDetails._id); // Check if already liked
     }
   }, [recipeData]);
+
+  const fetchLikeCount = async (foodId) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/food/likes/${foodId}`
+      );
+      setLikeCount(response.data.likeCount);
+    } catch (error) {
+      console.error("Error fetching like count:", error);
+    }
+  };
+
+  const checkIfLiked = async (foodId) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/food/isLiked/${foodId}`,
+        { withCredentials: true }
+      );
+      // console.log(response.data)
+      setIsLiked(response.data.isLiked); // Set the liked status
+    } catch (error) {
+      console.error("Error checking like status:", error);
+    }
+  };
 
   const handlePrint = () => {
     window.print();
@@ -36,6 +65,8 @@ const RecipeHeader = ({ recipeData }) => {
         { withCredentials: true }
       );
       console.log(response);
+      setLikeCount((prevCount) => prevCount + 1);
+      setIsLiked(true); // Mark as liked
       toast.success("Recipe liked successfully!");
     } catch (error) {
       console.error("Error liking the recipe:", error.response.data.message);
@@ -82,7 +113,10 @@ const RecipeHeader = ({ recipeData }) => {
         <nav aria-label="breadcrumb" className="text-sm breadcrumbs">
           <ul className="flex justify-center gap-2">
             <li>
-              <Link to="/category" className="text-blue-800 hover:underline hover:font-semibold">
+              <Link
+                to="/category"
+                className="text-blue-800 hover:underline hover:font-semibold"
+              >
                 Categories
               </Link>
             </li>
@@ -101,9 +135,7 @@ const RecipeHeader = ({ recipeData }) => {
               <span>/</span>
             </li>
             <li>
-              <span className="text-gray-600">
-                {recipe.FoodDetails.foodName}
-              </span>
+              <span className="text-gray-600">{recipe.FoodDetails.foodName}</span>
             </li>
           </ul>
         </nav>
@@ -122,20 +154,19 @@ const RecipeHeader = ({ recipeData }) => {
                 ))}
               </div>
               <div className="flex items-center">
-                {/* {[...Array(5)].map((_, starIndex) => (
-                  <IoStarSharp key={starIndex} className="text-yellow-400" />
-                ))} */}
-                {/* <span className="ml-2 text-gray-500 hidden sm:inline">
-                  (Random rating)
-                </span> */}
                 <div>
                   <div className="flex flex-wrap justify-around">
                     {[
                       {
                         icon: FaThumbsUp,
-                        label: "Like",
-                        action: () =>
-                          handleLikeIncrement(recipe.FoodDetails._id),
+                        label: `Like (${likeCount})`, // Show like count
+                        action: () => {
+                          if (!isLiked) {
+                            handleLikeIncrement(recipe.FoodDetails._id);
+                          } else {
+                            toast.info("You already liked this recipe!");
+                          }
+                        },
                       },
                       {
                         icon: FaShareAlt,
@@ -150,51 +181,53 @@ const RecipeHeader = ({ recipeData }) => {
                     ].map((item, index) => (
                       <button
                         key={index}
-                        className="btn border mr-2 p-2 rounded transition duration-300 flex flex-row justify-center hover:bg-blue-800 hover:text-white"
+                        className={`btn border mr-2 p-2 rounded transition duration-300 flex flex-row justify-center ${
+                          item.label.includes("Like") && isLiked ? 'bg-gray-300' : 'hover:bg-blue-800 hover:text-white'
+                        }`}
                         onClick={item.action}
                       >
                         <item.icon className="mb-1" />
-                        <span className="block text-sm mx-1 ">
-                          {item.label}
-                        </span>
+                        <span className="block text-sm mx-1 ">{item.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
               </div>
             </div>
+
             <p className="text-lg mb-4">
               {recipe.FoodDetails.foodDesc || "No description available."}
             </p>
+
             <div className="grid grid-cols-3 md:grid-cols-6 justify-around text-center mt-4">
               {[
                 {
-                  icon: FaClock, // Time-related icon
+                  icon: FaClock,
                   label: "Prep Time",
                   value: `${recipe.FoodDetails.preparationTime} min`,
                 },
                 {
-                  icon: FaClock, // Time-related icon
+                  icon: FaClock,
                   label: "Cook Time",
                   value: `${recipe.FoodDetails.cookingTime} min`,
                 },
                 {
-                  icon: FaUtensils, // Serving or dining icon
+                  icon: FaUtensils,
                   label: "Servings",
                   value: "4 people",
                 },
                 {
-                  icon: FaChartLine, // Difficulty icon
+                  icon: FaChartLine,
                   label: "Difficulty",
                   value: recipe.FoodDetails.difficulty,
                 },
                 {
-                  icon: FaMapMarkerAlt, // Location icon
+                  icon: FaMapMarkerAlt,
                   label: "Country",
                   value: recipe.FoodDetails.foodArea,
                 },
                 {
-                  icon: FaLeaf, 
+                  icon: FaLeaf,
                   label: "Veg / Non-Veg",
                   value: "",
                 },

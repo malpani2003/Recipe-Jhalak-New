@@ -131,6 +131,61 @@ const popularCategory = async (req, res) => {
     res.status(500).json({ message: "Error fetching popular categories" });
   }
 };
+const searchCategoryByName = async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    const categoriesList = await Category_Collection.find({
+      Category_Name: { $regex: query, $options: "i" },
+    });
+
+    if (categoriesList.length === 0) {
+      return res.status(404).json({ message: "No categories found" });
+    }
+
+    res.json({ categories: categoriesList });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const updateCategory = async (req, res) => {
+  const { categoryID } = req.params;
+  const updatedData = req.body;
+
+  try {
+    const updatedCategory = await Category_Collection.findByIdAndUpdate(
+      categoryID,
+      updatedData,
+      { new: true }
+    );
+    if (!updatedCategory) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json({ message: "Category updated", updatedCategory });
+  } catch (error) {
+    response
+      .status(500)
+      .json({ error: `Failed to Update category: ${error.message}` });
+  }
+};
+const deleteCategory = async (req, res) => {
+  const { categoryID } = req.params;
+
+  try {
+    const deletedCategory = await Category_Collection.findByIdAndDelete(
+      categoryID
+    );
+    if (!deletedCategory) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json({ message: "Category deleted", deletedCategory });
+  } catch (error) {
+    response
+      .status(500)
+      .json({ error: `Failed to delete category: ${error.message}` });
+  }
+};
 
 module.exports = {
   addCategory,
@@ -138,43 +193,7 @@ module.exports = {
   getAllCategory,
   incrementVisitCount,
   popularCategory,
-  updateCategory: async (request, response) => {
-    try {
-      const categoryId = request.params.category_id.trim();
-      const { Category_nm, Category_img, Category_desc } = request.body;
-
-      const category = await Category_Collection.findById(categoryId);
-      if (!category) {
-        return response.status(404).json({ error: "Category not found" });
-      }
-
-      category.Category_Name = Category_nm.trim();
-      category.Category_Img = Category_img.trim();
-      category.Category_Desc = Category_desc.trim();
-
-      const updatedCategory = await category.save();
-      response.status(200).json(updatedCategory);
-    } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Failed to update category: ${error.message}` });
-    }
-  },
-  deleteCategory: async (request, response) => {
-    try {
-      const categoryId = request.params.category_id.trim();
-
-      const category = await Category_Collection.findById(categoryId);
-      if (!category) {
-        return response.status(404).json({ error: "Category not found" });
-      }
-
-      await category.remove();
-      response.status(204).send();
-    } catch (error) {
-      response
-        .status(500)
-        .json({ error: `Failed to delete category: ${error.message}` });
-    }
-  },
+  searchCategoryByName,
+  deleteCategory,
+  updateCategory
 };

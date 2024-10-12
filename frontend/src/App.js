@@ -19,6 +19,9 @@ import "react-toastify/dist/ReactToastify.css";
 import NewProfile from "./Components/Profile/NewUserProfile";
 import ContactUs from "./Components/Contact/ContactUs";
 import { AuthContext } from "./authContext";
+import DifficultyFilter from "./Components/Food/DifficultyFilter";
+import FoodTypeFilter from "./Components/Food/FoodTypeFilter";
+import RecipeFilter from "./Components/Food/RecipeFilter";
 function App() {
   const [isLogin, setIsLogin] = useState(false);
   return (
@@ -37,6 +40,9 @@ function App() {
           <Route path="/filter" element={<Filter />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/difficulty/:level" element={<DifficultyFilter></DifficultyFilter>} />
+          <Route path="/type/:type" element={<FoodTypeFilter></FoodTypeFilter>}></Route>
+          <Route path="/filterPage" element={<RecipeFilter></RecipeFilter>}></Route>
           <Route path="*" element={<ErrorPage />} />
         </Routes>
         <Footer />

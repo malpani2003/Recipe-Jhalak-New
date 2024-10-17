@@ -169,6 +169,7 @@ function ShowCategory() {
               <img
                 src={element["Category_Img"]}
                 alt={element["Category_Name"]}
+                loading="lazy"
                 className="w-full h-40 object-cover"
               />
               <div className="p-4">

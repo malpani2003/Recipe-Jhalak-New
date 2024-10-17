@@ -31,10 +31,10 @@ app.use(
 );
 
 // app.use(
-//   cors({
+//   cors({ 
 //     origin: 'http://localhost:3000', 
 //     credentials: true, 
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],  
 //     allowedHeaders: ['Content-Type', 'Authorization'], 
 //     optionsSuccessStatus: 200,  
 //   })

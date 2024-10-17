@@ -141,6 +141,7 @@ function CategoryWiseItem() {
                 <img
                   src={foodImg}
                   alt={foodName}
+                  loading="lazy"
                   className="w-full h-56 object-cover transition-transform duration-300"
                 />
                 <div className="p-4">

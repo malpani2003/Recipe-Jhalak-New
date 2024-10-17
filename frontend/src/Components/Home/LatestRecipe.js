@@ -29,6 +29,7 @@ const LatestRecipe = () => {
             <img
               src={item.foodImg}
               alt={item.foodName}
+              loading="lazy"
               className="w-full h-48 object-cover"
             />
             <div className="p-4">

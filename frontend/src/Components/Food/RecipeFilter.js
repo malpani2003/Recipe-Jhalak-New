@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader } from "lucide-react";
 
 const RecipeFilter = () => {
   const [recipes, setRecipes] = useState([]);
@@ -18,7 +18,7 @@ const RecipeFilter = () => {
     setIsLoading(true);
     setError(null);
     try {
-      let url = "http://localhost:3001/api/food/get?";
+      let url = `${process.env.REACT_APP_API_URL}/food/get?`;
       const params = new URLSearchParams();
 
       if (categoryFilter.length > 0) {
@@ -163,9 +163,7 @@ const RecipeFilter = () => {
         {/* Recipes List */}
         <div className="lg:w-3/4">
           {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
+             <Loader></Loader>
           ) : error ? (
             <div className="text-red-500 text-center">{error}</div>
           ) : recipes.length === 0 ? (

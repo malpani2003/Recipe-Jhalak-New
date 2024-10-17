@@ -28,7 +28,7 @@ function App() {
     <AuthContext.Provider value={{isLogin,setIsLogin}}>
       <BrowserRouter>
         <Navbar />
-        <Routes>
+        <Routes> 
           <Route path="/" element={<Index />} />
           <Route path="/category/:category" element={<CategoryWiseItem />} />
           <Route path="/food/add" element={<FoodForm />} />
